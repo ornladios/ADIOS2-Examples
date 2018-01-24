@@ -5,12 +5,8 @@ using finite differences. This examples shows a straight-forward way to hook
 an application to the ADIOS2 library for its IO.
 
 
-1. simulation: illustrates the Write API as well as has implementations of other IO libraries
+1. simulation: illustrates the Write API
   
-    * adios 1.x    
-    * hdf5 sequential, separate file per process per step
-    * phdf5 parallel, steps appended to the same one file
-
 2. analysis: illustrates the Read API that allows running the reader either as
 
     * post-mortem to read all output steps
