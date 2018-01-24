@@ -59,21 +59,19 @@ $ mpirun -n 2 ./heatAnalysis runtimecfg/bpfile.xml sim.bp analysis.bp 2 1
 Notes:
 1. 	Engines for file-based output and post-mortem reading: 
 
-   * BPFile
-   * HDF5
-   * ADIOS1
+ * BPFile
+ * HDF5
+ * ADIOS1
 
 2. Engines for in situ execution
-
-   * SST
-   * InSituMPI
-     Must run the codes together with one mpirun command (MPMD style), e.g. 
+ * SST
+ * InSituMPI - Must run the codes together with one mpirun command (MPMD style), e.g. 
+   
 ```bash
 $ mpirun -n 12 ./heatSimulation runtimecfg/insitu.xml  sim.bp  4 3  5 10 10 10 :  \
          -n 2 ./heatAnalysis runtimecfg/insitu.xml sim.bp analysis.bp 2 1
 ```
-   * DataMan
-     Only for N-to-N data transfers. 
+ * DataMan - Only for N-to-N data transfers. 
      (Must run writer and reader with the same number of processes and same decomposition)
 
 
