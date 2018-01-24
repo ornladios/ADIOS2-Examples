@@ -1,0 +1,25 @@
+## Setup for your system to build the C++ examples
+#
+# We need the following information:
+#  - location of the ADIOS v2 installation
+#  - the C++ compiler, C++-11 compatible
+#    - this should be the MPI C++ compiler if you built ADIOS with MPI
+#  - compiler flags if necessary to make the build work on your system
+#  - linker flags if necessary to make the build work on your system
+#
+# Optional information to build more stuff
+#  - location of the VTK-m installation 
+
+## ADIOS v2 installation
+override ADIOS_DIR=/opt/adios2
+
+## C++ settings
+CXX=mpic++
+CXXFLAGS=-g -std=gnu++11 
+LDFLAGS=-g 
+
+## VTK-m settings (need separate include and libraries)
+override VTKM_DIR=/opt/vtkm
+override VTKM_INC=-I${VTKM_DIR}/include/vtkm-1.1
+override VTKM_LIB=-L${VTKM_DIR}/lib -lvtkm_rendering-1.1 -lvtkm_cont-1.1
+

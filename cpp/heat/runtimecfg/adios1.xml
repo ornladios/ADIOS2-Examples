@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<!-- Config XML file fo the
+     - heatSimulation
+     - heatAnalysis
+     executables -->
+
+<adios-config>
+
+    <!--===========================================
+           Configuration for the Simulation Output 
+        ===========================================-->
+
+    <io name="SimulationOutput">
+        <engine type="ADIOS1">
+        </engine>
+
+        <!-- ADIOS 1.x had no default output transport
+             so we must give one here -->
+        <transport type="File">
+            <!-- N process to 1 file -->
+            <parameter key="Library" value="MPI"/>
+        </transport>
+    </io>
+
+
+    <!--=========================================
+           Configuration for the Analysis Input
+        =========================================-->
+
+    <io name="AnalysisInput">
+        <engine type="ADIOS1">
+	    </engine>
+
+        <transport type="File">
+        </transport>
+    </io>
+    
+    
+    <!--=========================================
+           Configuration for the Analysis Output
+        =========================================-->
+
+    <io name="AnalysisOutput">
+        <engine type="ADIOS1">
+	    </engine>
+
+        <!-- ADIOS 1.x had no default output transport
+             so we must give one here -->
+        <transport type="File">
+            <!-- N process to N file -->
+            <parameter key="Library" value="POSIX"/>
+        </transport>
+    </io>
+    
+</adios-config>

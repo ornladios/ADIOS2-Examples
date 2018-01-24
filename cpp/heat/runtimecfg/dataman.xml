@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<!-- Config XML file fo the
+     - heatSimulation
+     - heatAnalysis
+     executables -->
+
+<adios-config>
+
+    <!--===========================================
+           Configuration for the Simulation Output
+        ===========================================-->
+
+    <io name="SimulationOutput">
+        <engine type="DataMan">
+        </engine>
+
+        <transport type="WAN">
+
+            <!-- POSIX, stdio (C FILE*), fstream (C++) -->
+            <parameter key="Library" value="ZMQ"/>
+
+            <!-- IP Address for network transfer -->
+            <parameter key="IPAddress" value="127.0.0.1"/>
+
+        </transport>
+
+    </io>
+
+
+    <!--========================================
+           Configuration for the Analysis Input
+        ========================================-->
+
+    <io name="AnalysisInput">
+        <engine type="DataMan">
+        </engine>
+
+        <transport type="WAN">
+
+            <!-- POSIX, stdio (C FILE*), fstream (C++) -->
+            <parameter key="Library" value="ZMQ"/>
+
+            <!-- timeout in seconds -->
+            <parameter key="Timeout" value="5"/>
+
+            <!-- IP Address for network transfer -->
+            <parameter key="IPAddress" value="127.0.0.1"/>
+
+        </transport>
+
+    </io>
+
+
+    <!--=========================================
+           Configuration for the Analysis Output
+        =========================================-->
+
+    <io name="AnalysisOutput">
+        <engine type="BPFile">
+        </engine>
+    </io>
+
+</adios-config>

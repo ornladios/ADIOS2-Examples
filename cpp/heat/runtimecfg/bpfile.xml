@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<!-- Config XML file fo the  
+     - heatSimulation
+     - heatAnalysis
+     executables -->
+
+<adios-config>
+
+    <!--====================================
+           Configuration for the Simulation Output 
+        ====================================-->
+
+    <io name="SimulationOutput">
+        <engine type="BPFile">
+        </engine>
+    </io>
+
+
+    <!--=======================================
+           Configuration for the Analysis Input
+        =======================================-->
+
+    <io name="AnalysisInput">
+        <engine type="BPFile">
+        </engine>
+    </io>
+
+
+    <!--=======================================
+           Configuration for the Analysis Output
+        =======================================-->
+    
+    <io name="AnalysisOutput">
+        <engine type="BPFile">
+        </engine>
+    </io>
+</adios-config>
