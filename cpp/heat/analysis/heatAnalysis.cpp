@@ -87,22 +87,8 @@ int main(int argc, char *argv[])
         AnalysisSettings settings(argc, argv, rank, nproc);
         adios2::ADIOS ad(settings.configfile, mpiReaderComm, adios2::DebugON);
 
-        // Define method for engine creation
-        // 1. Get method def from config file or define new one
-
+        // Define IO method for engine creation
         adios2::IO &inIO = ad.DeclareIO("AnalysisInput");
-        if (!inIO.InConfigFile())
-        {
-            // if not defined by user, we can change the default settings
-            // BPFile is the default engine
-            inIO.SetEngine("BPFile");
-            inIO.SetParameters({{"num_threads", "1"}});
-
-            // ISO-POSIX file output is the default transport (called "File")
-            // Passing parameters to the transport
-            inIO.AddTransport("File", {{"verbose", "4"}});
-        }
-
         adios2::IO &outIO = ad.DeclareIO("AnalysisOutput");
 
         adios2::Engine &reader =
@@ -160,7 +146,7 @@ int main(int argc, char *argv[])
 
             if (!rank)
             {
-                std::cout << "Processing step " << step << std::endl;
+                std::cout << "Analysis step " << step << std::endl;
             }
 
             // Create a 2D selection for the subset

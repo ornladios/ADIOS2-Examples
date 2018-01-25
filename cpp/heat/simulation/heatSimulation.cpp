@@ -4,7 +4,7 @@
  *
  * heatSimulation.cpp
  *
- * 2D Heat Transfer simulation example for ADIOS2 tutorial 
+ * 2D Heat Transfer simulation example for ADIOS2 tutorial
  *
  * Created on: Feb 2017
  *     Author: Norbert Podhorszki
@@ -23,16 +23,17 @@
 
 void printUsage()
 {
-    std::cout << "Usage: heatSimulation  config   output  N  M   nx  ny   steps "
-                 "iterations\n"
-              << "  config: XML config file to use\n"
-              << "  output: name of output data file/stream\n"
-              << "  N:      number of processes in X dimension\n"
-              << "  M:      number of processes in Y dimension\n"
-              << "  nx:     local array size in X dimension per processor\n"
-              << "  ny:     local array size in Y dimension per processor\n"
-              << "  steps:  the total number of steps to output\n"
-              << "  iterations: one step consist of this many iterations\n\n";
+    std::cout
+        << "Usage: heatSimulation  config   output  N  M   nx  ny   steps "
+           "iterations\n"
+        << "  config: XML config file to use\n"
+        << "  output: name of output data file/stream\n"
+        << "  N:      number of processes in X dimension\n"
+        << "  M:      number of processes in Y dimension\n"
+        << "  nx:     local array size in X dimension per processor\n"
+        << "  ny:     local array size in Y dimension per processor\n"
+        << "  steps:  the total number of steps to output\n"
+        << "  iterations: one step consist of this many iterations\n\n";
 }
 
 int main(int argc, char *argv[])
@@ -63,15 +64,16 @@ int main(int argc, char *argv[])
     {
         double timeStart = MPI_Wtime();
         Settings settings(argc, argv, rank, nproc);
-        if (!rank) {
-            std::cout << "Process decomposition  : " << settings.npx << " x " 
-                << settings.npy << std::endl; 
-            std::cout << "Array size per process : " 
-                << settings.ndx << " x " << settings.ndy << std::endl; 
-            std::cout << "Number of output steps : " 
-                << settings.steps << std::endl; 
-            std::cout << "Iterations per step    : " 
-                << settings.iterations << std::endl; 
+        if (!rank)
+        {
+            std::cout << "Process decomposition  : " << settings.npx << " x "
+                      << settings.npy << std::endl;
+            std::cout << "Array size per process : " << settings.ndx << " x "
+                      << settings.ndy << std::endl;
+            std::cout << "Number of output steps : " << settings.steps
+                      << std::endl;
+            std::cout << "Iterations per step    : " << settings.iterations
+                      << std::endl;
         }
 
         HeatTransfer ht(settings);
@@ -88,7 +90,7 @@ int main(int argc, char *argv[])
         for (unsigned int t = 1; t <= settings.steps; ++t)
         {
             if (rank == 0)
-                std::cout << "Step " << t << ":\n";
+                std::cout << "Simulation step " << t << ":\n";
             for (unsigned int iter = 1; iter <= settings.iterations; ++iter)
             {
                 ht.iterate();

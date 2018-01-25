@@ -8,8 +8,8 @@
  *      Author: Norbert Podhorszki
  */
 
-#ifndef READSETTINGS_H_
-#define READSETTINGS_H_
+#ifndef ANALYSISSETTINGS_H_
+#define ANALYSISSETTINGS_H_
 
 #include <string>
 #include <vector>
@@ -42,4 +42,4 @@ public:
     void DecomposeArray(int gndx, int gndy);
 };
 
-#endif /* READSETTINGS_H_ */
+#endif /* ANALYSISSETTINGS_H_ */
