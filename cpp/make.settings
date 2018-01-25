@@ -10,16 +10,24 @@
 # Optional information to build more stuff
 #  - location of the VTK-m installation 
 
-## ADIOS v2 installation
+#
+# ADIOS v2 installation
+#
 override ADIOS_DIR=/opt/adios2
 
-## C++ settings
+#
+# C++ settings
+#
 CXX=mpic++
 CXXFLAGS=-g -std=gnu++11 
 LDFLAGS=-g 
 
-## VTK-m settings (need separate include and libraries)
-override VTKM_DIR=/opt/vtkm
+#
+# VTK-m settings (need separate include and libraries)
+#
+# set USE_VTKM to OFF if you don't have VTK-m 
+USE_VTKM=ON  
+override VTKM_DIR=/opt/vtk-m
 override VTKM_INC=-I${VTKM_DIR}/include/vtkm-1.1
 override VTKM_LIB=-L${VTKM_DIR}/lib -lvtkm_rendering-1.1 -lvtkm_cont-1.1
 

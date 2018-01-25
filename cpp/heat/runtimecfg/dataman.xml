@@ -60,4 +60,14 @@
         </engine>
     </io>
 
+
+    <!--=============================================
+           Configuration for the Visualization Input
+        =============================================-->
+    
+    <io name="VizInput">
+        <engine type="BPFile">
+        </engine>
+    </io>
+
 </adios-config>

@@ -41,7 +41,17 @@
         =========================================-->
     
     <io name="AnalysisOutput">
-        <engine type="BPFile">
+        <engine type="InSituMPI">
+        </engine>
+    </io>
+
+
+    <!--=============================================
+           Configuration for the Visualization Input
+        =============================================-->
+    
+    <io name="VizInput">
+        <engine type="InSituMPI">
         </engine>
     </io>
 

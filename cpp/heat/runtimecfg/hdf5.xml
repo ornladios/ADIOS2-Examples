@@ -35,4 +35,14 @@
         </engine>
     </io>
 
+
+    <!--=============================================
+           Configuration for the Visualization Input
+        =============================================-->
+    
+    <io name="VizInput">
+        <engine type="HDF5">
+        </engine>
+    </io>
+
 </adios-config>
