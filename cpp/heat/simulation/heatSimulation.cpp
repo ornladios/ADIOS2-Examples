@@ -79,6 +79,8 @@ int main(int argc, char *argv[])
         HeatTransfer ht(settings);
         IO io(settings, mpiHeatTransferComm);
 
+        if (rank == 0)
+            std::cout << "Simulation step 0: initialization\n";
         ht.init(false, mpiHeatTransferComm);
         // ht.printT("Initialized T:", mpiHeatTransferComm);
         ht.heatEdges();
@@ -90,7 +92,7 @@ int main(int argc, char *argv[])
         for (unsigned int t = 1; t <= settings.steps; ++t)
         {
             if (rank == 0)
-                std::cout << "Simulation step " << t << ":\n";
+                std::cout << "Simulation step " << t << "\n";
             for (unsigned int iter = 1; iter <= settings.iterations; ++iter)
             {
                 ht.iterate();

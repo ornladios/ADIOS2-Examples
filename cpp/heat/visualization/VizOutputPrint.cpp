@@ -50,7 +50,7 @@ void OutputVariable(const adios2::VariableBase *var,
         myfile << std::setw(5) << step << std::setw(5) << i;
         for (int j = 0; j < var->m_Shape[1]; j++)
         {
-            myfile << std::setw(9) << std::setprecision(2)
+            myfile << std::setw(9) << std::setprecision(4)
                    << buf[i * var->m_Shape[1] + j];
         }
         myfile << std::endl;
