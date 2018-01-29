@@ -102,7 +102,9 @@ int main(int argc, char *argv[])
                     Tin.resize(vTin->TotalSize());
                 }
 
-                std::cout << "Visualization step " << step << std::endl;
+                std::cout << "Visualization step " << step
+                          << " processing analysis step "
+                          << reader.CurrentStep() << std::endl;
 
                 // Create a 2D selection for the subset
                 vTin->SetSelection(

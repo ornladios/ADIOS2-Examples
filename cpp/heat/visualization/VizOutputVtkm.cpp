@@ -103,7 +103,7 @@ bool RenderVariable2D(const adios2::VariableBase *var, const void *buff,
 
     vtkm::cont::DataSetFieldAdd dsf;
     dsf.AddPointField(ds, var->m_Name, varBuff, numPoints);
-    ds.PrintSummary(std::cout);
+    //ds.PrintSummary(std::cout);
 
     Render2D(ds, var->m_Name, vtkm::rendering::ColorTable("temperature"),
              settings);
