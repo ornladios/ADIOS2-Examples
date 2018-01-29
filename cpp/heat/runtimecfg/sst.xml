@@ -31,7 +31,7 @@
         =========================================-->
 
     <io name="AnalysisOutput">
-        <engine type="BPFile">
+        <engine type="SST">
 	    </engine>
     </io>
 
@@ -41,7 +41,7 @@
         =============================================-->
     
     <io name="VizInput">
-        <engine type="BPFile">
+        <engine type="SST">
         </engine>
     </io>
 
