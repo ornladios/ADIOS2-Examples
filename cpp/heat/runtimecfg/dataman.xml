@@ -21,6 +21,7 @@
 
             <!-- IP Address for network transfer -->
             <parameter key="IPAddress" value="127.0.0.1"/>
+            <parameter key="Blocking" value="no"/>
 
         </transport>
 
@@ -45,6 +46,7 @@
 
             <!-- IP Address for network transfer -->
             <parameter key="IPAddress" value="127.0.0.1"/>
+            <parameter key="Blocking" value="no"/>
 
         </transport>
 
