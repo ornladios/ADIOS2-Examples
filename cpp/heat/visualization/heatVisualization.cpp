@@ -119,9 +119,8 @@ int main(int argc, char *argv[])
                 reader.GetDeferred<double>(*vTin, Tin.data());
                 reader.EndStep();
 
-                /* Plot T */
-                settings.outputfile = "T." + std::to_string(step) + ".pnm";
-                OutputVariable(vTin, Tin, settings, step);
+                /* Plot or print T */
+                OutputVariable(vTin, Tin, settings, reader.CurrentStep());
 
                 step++;
                 firstStep = false;
