@@ -35,10 +35,7 @@
 #include <vtkm/rendering/Scene.h>
 #include <vtkm/rendering/Scene.h>
 #include <vtkm/rendering/TextAnnotationScreen.h>
-#include <vtkm/rendering/View1D.h>
 #include <vtkm/rendering/View2D.h>
-#include <vtkm/rendering/View3D.h>
-#include <vtkm/rendering/View3D.h>
 
 #include "VizSettings.h"
 

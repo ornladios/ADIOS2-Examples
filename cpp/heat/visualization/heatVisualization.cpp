@@ -79,10 +79,10 @@ int main(int argc, char *argv[])
             while (true)
             {
                 adios2::StepStatus status =
-                    reader.BeginStep(adios2::StepMode::NextAvailable, 0.0f);
+                    reader.BeginStep(adios2::StepMode::NextAvailable, 10.0f);
                 if (status == adios2::StepStatus::NotReady)
                 {
-                    std::cout << "Stream not read yet. Waiting...\n";
+                    // std::cout << "Stream not ready yet. Waiting...\n";
                     std::this_thread::sleep_for(
                         std::chrono::milliseconds(1000));
                     continue;
@@ -109,15 +109,15 @@ int main(int argc, char *argv[])
                     Tin.resize(vTin->TotalSize());
                 }
 
-                std::cout << "Visualization step " << step
-                          << " processing analysis step "
-                          << reader.CurrentStep() << std::endl;
-
                 // Create a 2D selection for the subset
                 vTin->SetSelection(
                     adios2::Box<adios2::Dims>({0, 0}, vTin->m_Shape));
                 reader.GetDeferred<double>(*vTin, Tin.data());
                 reader.EndStep();
+
+                std::cout << "Visualization step " << step
+                          << " processing analysis step "
+                          << reader.CurrentStep() << std::endl;
 
                 /* Plot or print T */
                 OutputVariable(vTin, Tin, settings, reader.CurrentStep());
