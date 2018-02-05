@@ -45,7 +45,7 @@ clean:
 	rm -f heatSimulation heatAnalysis heatVisualization
 
 distclean: clean
-	rm -f *.png *.pnm core core.*
+	rm -f *.png *.pnm T.txt core core.*
 	rm -rf *.bp *.bp.dir 
 	rm -f *.h5
 	rm -f conf *.bpflx
