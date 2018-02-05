@@ -150,11 +150,6 @@ int main(int argc, char *argv[])
                 MPI_Barrier(mpiReaderComm); // sync processes just for stdout
             }
 
-            if (!rank)
-            {
-                std::cout << "Analysis step " << step << std::endl;
-            }
-
             // Create a 2D selection for the subset
             vTin->SetSelection(
                 adios2::Box<adios2::Dims>(settings.offset, settings.readsize));
@@ -165,6 +160,13 @@ int main(int argc, char *argv[])
             /*printDataStep(Tin.data(), settings.readsize.data(),
                           settings.offset.data(), rank, step); */
             reader.EndStep();
+
+            if (!rank)
+            {
+                std::cout << "Analysis step " << step
+                          << " processing simulation step "
+                          << reader.CurrentStep() << std::endl;
+            }
 
             /* Compute dT from current T (Tin) and previous T (Tout)
              * and save Tin in Tout for output and for future computation
