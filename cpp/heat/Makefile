@@ -4,11 +4,19 @@ include ../make.settings
 override ADIOS_INC=-I${ADIOS_DIR}/include
 override ADIOS_LIB=`${ADIOS_DIR}/bin/adios2-config --libs`
 
-default: heatSimulation heatAnalysis heatVisualization
-all: default
+default: help
+all: heatSimulation heatAnalysis heatVisualization
 
 
 INC=${ADIOS_INC}
+
+
+help:
+	@echo "Make targets: "
+	@echo " all:         build the examples "
+	@echo " clean:       delete files from the build process"
+	@echo " clean-files: delete files from running the examples"
+
 
 %.o : %.cpp
 	${CXX} ${CXXFLAGS} -c ${INC} -o $@ $< 
@@ -44,11 +52,12 @@ clean:
 	rm -f simulation/*.o analysis/*.o visualization/*.o core.*
 	rm -f heatSimulation heatAnalysis heatVisualization
 
-distclean: clean
+clean-files:
 	rm -f *.png *.pnm T.txt core core.*
 	rm -rf *.bp *.bp.dir 
 	rm -f *.h5
 	rm -f conf *.bpflx
 
+distclean: clean clean-files
 
 
