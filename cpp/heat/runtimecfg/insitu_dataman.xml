@@ -2,6 +2,7 @@
 <!-- Config XML file fo the
      - heatSimulation
      - heatAnalysis
+     - heatVisualization
      executables -->
 
 <!--     
@@ -42,6 +43,7 @@
 
     <io name="AnalysisOutput">
         <engine type="DataMan">
+            <parameter key="Blocking" value="no"/>
         </engine>
 
         <transport type="WAN">
@@ -51,7 +53,6 @@
 
             <!-- IP Address for network transfer -->
             <parameter key="IPAddress" value="127.0.0.1"/>
-            <parameter key="Blocking" value="no"/>
 
         </transport>
 
@@ -64,6 +65,7 @@
 
     <io name="VizInput">
         <engine type="DataMan">
+            <parameter key="Blocking" value="no"/>
         </engine>
 
         <transport type="WAN">
@@ -76,7 +78,6 @@
 
             <!-- IP Address for network transfer -->
             <parameter key="IPAddress" value="127.0.0.1"/>
-            <parameter key="Blocking" value="no"/>
 
         </transport>
 

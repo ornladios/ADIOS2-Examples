@@ -2,6 +2,7 @@
 <!-- Config XML file fo the
      - heatSimulation
      - heatAnalysis
+     - heatVisualization
      executables -->
 
 <adios-config>

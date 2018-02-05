@@ -37,12 +37,12 @@
     </io>
     
     
-    <!--=========================================
+    <!--===========================================
            Configuration for the Analysis Output
-        =========================================-->
-    
+        ===========================================-->
+
     <io name="AnalysisOutput">
-        <engine type="InSituMPI">
+        <engine type="SST">
         </engine>
     </io>
 
@@ -50,9 +50,9 @@
     <!--=============================================
            Configuration for the Visualization Input
         =============================================-->
-    
+
     <io name="VizInput">
-        <engine type="InSituMPI">
+        <engine type="SST">
         </engine>
     </io>
 
