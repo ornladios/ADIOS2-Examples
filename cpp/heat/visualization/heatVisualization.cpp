@@ -38,7 +38,6 @@ int main(int argc, char *argv[])
     int wrank, wnproc;
     MPI_Comm_rank(MPI_COMM_WORLD, &wrank);
     MPI_Comm_size(MPI_COMM_WORLD, &wnproc);
-    MPI_Barrier(MPI_COMM_WORLD);
 
     const unsigned int color = 3;
     MPI_Comm mpiVizComm;
