@@ -18,9 +18,7 @@
         ===========================================-->
 
     <io name="SimulationOutput">
-        <engine type="InSituMPI">
-            <parameter key="verbose" value="3"/>
-            <parameter key="FixedSchedule" value="true"/>
+        <engine type="SST">
         </engine>
     </io>
 
@@ -30,9 +28,7 @@
         ========================================-->
 
     <io name="AnalysisInput">
-        <engine type="InSituMPI">
-            <parameter key="verbose" value="3"/>
-            <parameter key="FixedSchedule" value="true"/>
+        <engine type="SST">
         </engine>
     </io>
     
