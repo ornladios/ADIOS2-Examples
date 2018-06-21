@@ -15,8 +15,8 @@
 
 #include "VizSettings.h"
 
-void OutputVariable(const adios2::VariableBase *var,
-                    const std::vector<double> data, VizSettings &settings,
+void OutputVariable(const adios2::Variable<double> &var,
+                    const std::vector<double> &data, VizSettings &settings,
                     const int step);
 
 #endif /* VIZOUTPUT_H_ */
