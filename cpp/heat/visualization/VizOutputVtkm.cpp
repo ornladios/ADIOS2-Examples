@@ -70,7 +70,8 @@ void Render2D(const vtkm::cont::DataSet &ds, const std::string &fieldNm,
     view.SaveAs(settings.outputfile);
 }
 
-bool RenderVariable2D(const adios2::VariableBase *var, const void *buff,
+template<class T>
+bool RenderVariable2D(const adios2::Variable<T> &var, const void *buff,
                       const VizSettings &settings)
 {
     /*
@@ -86,9 +87,9 @@ bool RenderVariable2D(const adios2::VariableBase *var, const void *buff,
     */
 
     // Create the dataset from the variables
-    vtkm::Vec<float, 2> origin(var->m_Start[1], var->m_Start[0]);
+    vtkm::Vec<float, 2> origin(var.Start()[1], var.Start()[0]);
     vtkm::Vec<float, 2> spacing(1, 1);
-    vtkm::Id2 dims(var->m_Count[1], var->m_Count[0]); // SET DIMS
+    vtkm::Id2 dims(var.Count()[1], var.Count()[0]); // SET DIMS
 
     vtkm::cont::DataSetBuilderUniform dsb;
     vtkm::cont::DataSet ds = dsb.Create(dims, origin, spacing);
@@ -99,19 +100,19 @@ bool RenderVariable2D(const adios2::VariableBase *var, const void *buff,
     vtkm::Id numPoints = dims[0] * dims[1];
 
     vtkm::cont::DataSetFieldAdd dsf;
-    dsf.AddPointField(ds, var->m_Name, varBuff, numPoints);
+    dsf.AddPointField(ds, var.Name(), varBuff, numPoints);
     //ds.PrintSummary(std::cout);
 
-    Render2D(ds, var->m_Name, vtkm::rendering::ColorTable("temperature"),
+    Render2D(ds, var.Name(), vtkm::rendering::ColorTable("temperature"),
              settings);
 
     return true;
 }
 
-void OutputVariable(const adios2::VariableBase *var,
-                    const std::vector<double> data, VizSettings &settings,
+void OutputVariable(const adios2::Variable<double> &var,
+                    const std::vector<double> &data, VizSettings &settings,
                     const int step)
 {
-    settings.outputfile = var->m_Name + "." + std::to_string(step) + ".pnm";
+    settings.outputfile = var.Name() + "." + std::to_string(step) + ".pnm";
     RenderVariable2D(var, data.data(), settings);
 }
