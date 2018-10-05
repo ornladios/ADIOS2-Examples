@@ -35,20 +35,20 @@ static unsigned int convertToUint(std::string varName, char *arg)
 
 Settings::Settings(int argc, char *argv[], int rank, int nproc) : rank{rank}
 {
-    if (argc < 9)
+    if (argc < 8)
     {
         throw std::invalid_argument("Not enough arguments");
     }
     this->nproc = (unsigned int)nproc;
 
-    configfile = argv[1];
-    outputfile = argv[2];
-    npx = convertToUint("N", argv[3]);
-    npy = convertToUint("M", argv[4]);
-    ndx = convertToUint("nx", argv[5]);
-    ndy = convertToUint("ny", argv[6]);
-    steps = convertToUint("steps", argv[7]);
-    iterations = convertToUint("iterations", argv[8]);
+    //configfile = argv[1];
+    outputfile = argv[1];
+    npx = convertToUint("N", argv[2]);
+    npy = convertToUint("M", argv[3]);
+    ndx = convertToUint("nx", argv[4]);
+    ndy = convertToUint("ny", argv[5]);
+    steps = convertToUint("steps", argv[6]);
+    iterations = convertToUint("iterations", argv[7]);
 
     if (npx * npy != this->nproc)
     {

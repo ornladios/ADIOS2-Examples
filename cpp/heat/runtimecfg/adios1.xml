@@ -25,19 +25,6 @@
 
 
     <!--=========================================
-           Configuration for the Analysis Input
-        =========================================-->
-
-    <io name="AnalysisInput">
-        <engine type="ADIOS1">
-	    </engine>
-
-        <transport type="File">
-        </transport>
-    </io>
-    
-    
-    <!--=========================================
            Configuration for the Analysis Output
         =========================================-->
 

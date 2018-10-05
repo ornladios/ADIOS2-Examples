@@ -29,31 +29,6 @@
     </io>
 
 
-    <!--========================================
-           Configuration for the Analysis Input
-        ========================================-->
-
-    <io name="AnalysisInput">
-        <engine type="DataMan">
-	<parameter key="Blocking" value="no"/>
-        </engine>
-
-        <transport type="WAN">
-
-            <!-- POSIX, stdio (C FILE*), fstream (C++) -->
-            <parameter key="Library" value="ZMQ"/>
-
-            <!-- timeout in seconds -->
-            <parameter key="Timeout" value="5"/>
-
-            <!-- IP Address for network transfer -->
-            <parameter key="IPAddress" value="127.0.0.1"/>
-
-        </transport>
-
-    </io>
-
-
     <!--=========================================
            Configuration for the Analysis Output
         =========================================-->

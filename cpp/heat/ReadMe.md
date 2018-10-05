@@ -22,8 +22,7 @@ Example
 
 1. Simulation: produce an output
 
-Simulation usage:  heatSimulation  config output  N  M   nx  ny   steps iterations
-  config: XML config file to use
+Simulation usage:  heatSimulation  output  N  M   nx  ny   steps iterations
   output: name of output data file/stream
   N:      number of processes in X dimension
   M:      number of processes in Y dimension
@@ -32,19 +31,18 @@ Simulation usage:  heatSimulation  config output  N  M   nx  ny   steps iteratio
   steps:  the total number of steps to output
   iterations: one step consist of this many iterations
 
-The ADIOS2 executable needs an XML config file to select the Engine used for the output. 
+The executables needs an XML config file named "adios2.xml" to select the Engine used for the output. 
 The engines are: BPFile, ADIOS1, HDF5, SST, DataMan, InSituMPI
-(corresponding XML config files are available in runtimecfg/). 
+(example XML config files are available in runtimecfg/). 
 
 
 ```bash
-$  mpirun -n 12 ./heatSimulation runtimecfg/bpfile.xml  sim.bp  4 3  5 10 10 10
+$  mpirun -n 12 ./heatSimulation  sim.bp  4 3  5 10 10 10
 ```
 
 2. Analysis: read the output step-by-step, calculate new data, and produce another output 
 
-Analysis Usage:   heatAnalysis  config  input output  N  M 
-  config: XML config file to use
+Analysis Usage:   heatAnalysis  input output  N  M 
   input:  name of input data file/stream
   output: name of output data file/stream
   N:      number of processes in X dimension
@@ -52,7 +50,7 @@ Analysis Usage:   heatAnalysis  config  input output  N  M
 
 
 ```bash
-$ mpirun -n 2 ./heatAnalysis runtimecfg/bpfile.xml sim.bp analysis.bp 2 1 
+$ mpirun -n 2 ./heatAnalysis sim.bp analysis.bp 2 1 
 
 ```
 
@@ -68,8 +66,8 @@ Notes:
  * InSituMPI - Must run the codes together with one mpirun command (MPMD style), e.g. 
    
 ```bash
-$ mpirun -n 12 ./heatSimulation runtimecfg/insitu.xml  sim.bp  4 3  5 10 10 10 :  \
-         -n 2 ./heatAnalysis runtimecfg/insitu.xml sim.bp analysis.bp 2 1
+$ mpirun -n 12 ./heatSimulation sim.bp  4 3  5 10 10 10 :  \
+         -n 2 ./heatAnalysis sim.bp analysis.bp 2 1
 ```
  * DataMan - Only for N-to-N data transfers. 
      (Must run writer and reader with the same number of processes and same decomposition)

@@ -13,16 +13,7 @@
 
     <io name="SimulationOutput">
         <engine type="SST">
-        </engine>
-    </io>
-
-
-    <!--========================================
-           Configuration for the Analysis Input
-        ========================================-->
-
-    <io name="AnalysisInput">
-        <engine type="SST">
+            <parameter key="DataTransport" value="rdma"/>
         </engine>
     </io>
 
@@ -33,6 +24,7 @@
 
     <io name="AnalysisOutput">
         <engine type="SST">
+            <parameter key="DataTransport" value="rdma"/>
 	    </engine>
     </io>
 
@@ -43,6 +35,7 @@
     
     <io name="VizInput">
         <engine type="SST">
+            <parameter key="DataTransport" value="rdma"/>
         </engine>
     </io>
 

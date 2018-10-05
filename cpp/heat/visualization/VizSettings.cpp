@@ -52,27 +52,27 @@ static unsigned int convertToUint(std::string varName, char *arg)
 
 VizSettings::VizSettings(int argc, char *argv[])
 {
-    if (argc < 3)
+    if (argc < 2)
     {
         throw std::invalid_argument("Not enough arguments");
     }
 
-    configfile = argv[1];
-    inputfile = argv[2];
+    //configfile = argv[1];
+    inputfile = argv[1];
+    if (argc > 2)
+    {
+        minValue = convertToDouble("min", argv[2]);
+    }
     if (argc > 3)
     {
-        minValue = convertToDouble("min", argv[3]);
+        maxValue = convertToDouble("max", argv[3]);
     }
     if (argc > 4)
     {
-        maxValue = convertToDouble("max", argv[4]);
+        width = convertToUint("width", argv[4]);
     }
     if (argc > 5)
     {
-        width = convertToUint("width", argv[5]);
-    }
-    if (argc > 6)
-    {
-        height = convertToUint("height", argv[6]);
+        height = convertToUint("height", argv[5]);
     }
 }

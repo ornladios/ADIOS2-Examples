@@ -17,16 +17,6 @@
     </io>
 
 
-    <!--========================================
-           Configuration for the Analysis Input
-        ========================================-->
-
-    <io name="AnalysisInput">
-        <engine type="HDF5"> 
-        </engine>
-    </io>
-
-
     <!--=========================================
            Configuration for the Analysis Output
         =========================================-->

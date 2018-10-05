@@ -1,0 +1,78 @@
+<?xml version="1.0"?>
+<adios-config>
+
+    <!-- example engines 
+
+        <engine type="BPFile"/>
+        <engine type="HDF5"/>
+        <engine type="SST"/>
+        <engine type="InSituMPI"/>
+
+        DataMan is more elaborate with a transport and IP address required
+        <io name="heat">
+            <engine type="DataMan">
+                <parameter key="Blocking" value="no"/>
+            </engine>
+
+            <transport type="WAN">
+                <parameter key="Library" value="ZMQ"/>
+                <parameter key="IPAddress" value="127.0.0.1"/>
+            </transport>
+        </io>
+     -->
+
+    <!-- example operators and operations
+        Operators are defined in the adios-config group.
+        Operations go inside an IO group (but not inside engine group)
+    
+    <operator name="CompressorZFP" type="zfp"/>
+    <operator name="CompressorSZ" type="sz"/>
+
+    <io name="SimulationOutput">
+        <variable name="T">
+            <operation operator="CompressorZFP">
+                <parameter key="accuracy" value="0.0001"/>
+            </operation>
+        </variable>
+    </io>
+
+    -->
+
+    <!--===========================================
+        Create an operator inside the ADIOS object 
+        ===========================================-->
+    <operator name="CompressorZFP" type="zfp"/>
+
+    <!--===========================================
+           Configuration for the Simulation Output 
+        ==========================================-->
+
+    <io name="SimulationOutput">
+        <engine type="BPFile">
+        </engine>
+    </io>
+
+
+    <!--=========================================
+           Configuration for the Analysis Output
+        =========================================-->
+    
+    <io name="AnalysisOutput">
+        <engine type="BPFile">
+        </engine>
+    </io>
+
+
+    <!--=============================================
+           Configuration for the Visualization Input
+           Should match the Simulation Output or the 
+           Analysis Output depending on what code you
+           attach to (simulation or analysis)
+        =============================================-->
+    
+    <io name="VizInput">
+        <engine type="BPFile">
+        </engine>
+    </io>
+
+</adios-config>

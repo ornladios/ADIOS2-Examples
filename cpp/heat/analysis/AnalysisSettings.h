@@ -19,7 +19,7 @@ class AnalysisSettings
 
 public:
     // user arguments
-    std::string configfile;
+    const std::string configfile = "adios2.xml";
     std::string inputfile;
     std::string outputfile;
     unsigned int npx; // Number of processes in X (slow) dimension

@@ -20,7 +20,7 @@ class VizSettings
 public:
     /* User arguments */
 
-    std::string configfile;
+    const std::string configfile = "adios2.xml";
     std::string inputfile;
 
     // Min/Max of color value range

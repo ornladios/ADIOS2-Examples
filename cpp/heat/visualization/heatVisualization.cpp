@@ -14,15 +14,16 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <chrono>
+#include <thread>
+#include <numeric>
 
 #include "VizOutput.h"
 #include "VizSettings.h"
 
 void printUsage()
 {
-    std::cout << "Usage: heatVisualization  config  input [ min  max  width  "
-                 "height ]\n"
-              << "  config : XML config file to use\n"
+    std::cout << "Usage: heatVisualization  input [ min  max  width  height ]\n"
               << "  input  : name of input data file/stream\n"
               << "  Optional arguments\n"
               << "  min    : lowest value for the colortable\n"
@@ -65,13 +66,18 @@ int main(int argc, char *argv[])
             // Define method for engine creation
             // 1. Get method def from config file or define new one
 
-            adios2::IO &inIO = ad.DeclareIO("VizInput");
+            adios2::IO inIO = ad.DeclareIO("VizInput");
 
-            adios2::Engine &reader = inIO.Open(
+            if (!rank)
+            {
+//                std::cout << "Using " << inIO.m_EngineType << " engine for input" << std::endl;
+            }
+
+            adios2::Engine reader = inIO.Open(
                 settings.inputfile, adios2::Mode::Read, MPI_COMM_SELF);
 
             std::vector<double> Tin;
-            adios2::Variable<double> *vTin = nullptr;
+            adios2::Variable<double> vTin;
             bool firstStep = true;
             int step = 0;
 
@@ -98,20 +104,31 @@ int main(int argc, char *argv[])
 
                 if (firstStep)
                 {
+                    size_t gndx = vTin.Shape()[0];
+                    size_t gndy = vTin.Shape()[1];
+
                     if (rank == 0)
                     {
-                        std::cout << "gndx       = " << vTin->m_Shape[0]
+                        std::cout << "gndx       = " << vTin.Shape()[0]
                                   << std::endl;
-                        std::cout << "gndy       = " << vTin->m_Shape[1]
+                        std::cout << "gndy       = " << vTin.Shape()[1]
                                   << std::endl;
                     }
-                    Tin.resize(vTin->TotalSize());
+                    //Tin.resize(std::accumulate(vTin.Count().begin(), vTin.Count().end(), vTin.Sizeof(), std::multiplies<size_t>()));
+                    Tin.resize(gndx*gndy);
+                    std::cout << "size       = " << Tin.size() << std::endl;
                 }
 
                 // Create a 2D selection for the subset
-                vTin->SetSelection(
-                    adios2::Box<adios2::Dims>({0, 0}, vTin->m_Shape));
-                reader.GetDeferred<double>(*vTin, Tin.data());
+                vTin.SetSelection(
+                    adios2::Box<adios2::Dims>({0, 0}, vTin.Shape()));
+                reader.Get<double>(vTin, Tin.data());
+
+                if (firstStep)
+                {
+                    inIO.LockDefinitions(); // a promise here that we don't change the read pattern over steps
+                }
+
                 reader.EndStep();
 
                 std::cout << "Visualization step " << step

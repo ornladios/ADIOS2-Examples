@@ -36,17 +36,17 @@ static unsigned int convertToUint(std::string varName, char *arg)
 AnalysisSettings::AnalysisSettings(int argc, char *argv[], int rank, int nproc)
 : rank{rank}
 {
-    if (argc < 6)
+    if (argc < 5)
     {
         throw std::invalid_argument("Not enough arguments");
     }
     this->nproc = (unsigned int)nproc;
 
-    configfile = argv[1];
-    inputfile = argv[2];
-    outputfile = argv[3];
-    npx = convertToUint("N", argv[4]);
-    npy = convertToUint("M", argv[5]);
+    //configfile = argv[1];
+    inputfile = argv[1];
+    outputfile = argv[2];
+    npx = convertToUint("N", argv[3]);
+    npy = convertToUint("M", argv[4]);
 
     if (npx * npy != this->nproc)
     {

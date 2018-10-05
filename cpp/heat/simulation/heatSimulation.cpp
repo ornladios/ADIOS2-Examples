@@ -24,9 +24,8 @@
 void printUsage()
 {
     std::cout
-        << "Usage: heatSimulation  config   output  N  M   nx  ny   steps "
+        << "Usage: heatSimulation   output  N  M   nx  ny   steps "
            "iterations\n"
-        << "  config: XML config file to use\n"
         << "  output: name of output data file/stream\n"
         << "  N:      number of processes in X dimension\n"
         << "  M:      number of processes in Y dimension\n"
@@ -88,7 +87,7 @@ int main(int argc, char *argv[])
 
         io.write(0, ht, settings, mpiHeatTransferComm);
 
-        for (unsigned int t = 1; t <= settings.steps; ++t)
+        for (unsigned int t = 1; t < settings.steps; ++t)
         {
             if (rank == 0)
                 std::cout << "Simulation step " << t << "\n";
