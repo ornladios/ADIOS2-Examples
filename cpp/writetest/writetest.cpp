@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
     {
         t_init_start = MPI_Wtime();
         adios_init_noxml (MPI_COMM_WORLD);
-        adios_set_max_buffer_size (Nx*sizeof(double)/1048576 + 2);
+        adios_set_max_buffer_size (Nx*sizeof(double)/1048576 + 32u);
         adios_declare_group (&gh, "restart", "iter", adios_stat_default);
         adios_select_method (gh, "POSIX", "verbose=3", "");
         adios_define_var (gh, "NX" ,"", adios_integer ,0, 0, 0);
@@ -114,7 +114,7 @@ int main(int argc, char *argv[])
         {
             adios_open (&fh, "restart", "writetest_adios1.bp", "a", MPI_COMM_WORLD);
             adios_groupsize = 4 + 4 + 4 + Nx * sizeof(double);
-            adios_group_size (fh, adios_groupsize, &adios_totalsize);
+            //adios_group_size (fh, adios_groupsize, &adios_totalsize);
             adios_write(fh, "NX", (void *) &Nx);
             adios_write(fh, "nproc", (void *) &nproc);
             adios_write(fh, "rank", (void *) &rank);
