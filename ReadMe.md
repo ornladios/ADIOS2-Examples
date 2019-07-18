@@ -16,10 +16,14 @@ The ADIOS source code is located at
 
 To build ADIOS2 examples
 
-1. Clone the repository:
+1. Clone the repository, and cd into it:
 
 ```bash
-$ git clone https://github.com/ornladios/adios2-examples.git 
+$ git clone https://github.com/ornladios/ADIOS2-examples.git
+```
+
+```bash
+$ cd ADIOS2-example
 ```
 
 2. Enter the directory for the language you are interested in, e.g.
