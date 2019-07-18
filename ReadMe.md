@@ -9,8 +9,8 @@ The ADIOS source code is located at
 ## Directory layout
 
 * cpp     - C++ examples (the native interface of ADIOS v2)
-* fortran - Fortran 90 examples
-* numpy   - Python/numpy examples
+* fortran - To be added
+* numpy   - To be added
 
 ## Getting Started
 
@@ -37,7 +37,7 @@ $ cd cpp
 4. Enter the directory for your chosen example, e.g.
 
 ```bash
-$ cd heatTransfer
+$ cd heat
 ```
 
 5. Build the example
