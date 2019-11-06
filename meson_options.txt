@@ -1,0 +1,3 @@
+
+option('ADIOS2_DIR', type : 'string', value : '/usr', description : 'ADIOS2 location')
+

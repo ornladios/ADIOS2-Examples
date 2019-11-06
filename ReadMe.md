@@ -48,3 +48,8 @@ $ make
 
 6. Run the example as described in its ReadMe.md
 
+7. Meson
+   Requirements:
+   - meson build
+   - mono-complete
+   

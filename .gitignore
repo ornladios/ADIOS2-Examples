@@ -22,7 +22,7 @@
 *.pyc
 *.bp
 *.bp.dir
-build/
+build*/
 
 # Mac OSX finder-related files
 .DS_Store
