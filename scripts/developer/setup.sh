@@ -3,7 +3,8 @@
 
 # Get github username
 read -p "Github username: " github_username
-if test -z "$var" then
+if test -z "${github_username}" 
+then
 	echo "Github username can't be empty"
 	exit
 fi
@@ -22,7 +23,7 @@ fi
 
 git checkout master
 git remote rm upstream
-git remote add upstream https://github.com/ornladios/ADIOS2.git
+git remote add upstream https://github.com/ornladios/ADIOS2-Examples.git
 
 echo "Local master branch to use upstream"
 git config branch.master.remote upstream
