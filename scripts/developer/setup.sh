@@ -9,6 +9,8 @@ then
 	exit
 fi
 
+git remote set-url origin https://github.com/${github_username}/ADIOS2-Examples.git
+
 echo "Checking SSH Github access"
 ssh -o ConnectTimeout=10 -T git@github.com 2>/dev/null
 
