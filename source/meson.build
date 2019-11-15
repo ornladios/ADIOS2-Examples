@@ -1,1 +1,2 @@
 subdir('cpp')
+subdir('c')

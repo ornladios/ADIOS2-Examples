@@ -9,38 +9,38 @@ The ADIOS2 source code is located at
 ## Directory layout
 
 * scripts:
-    * developer: setup scripts for developers
+    
+    - developer: setup scripts for developers
 
 * source: location for all examples source code 
 	
-	* cpp: examples for the low-level and high-level ADIOS2 C++ APIs
+	- cpp: examples for the low-level and high-level ADIOS2 C++ APIs
 	
 		- 001_hello-world:
 		
-	* c: examples for the C APIs (build on top of the C++ low-level APIs)
+	- c: examples for the C APIs (build on top of the C++ low-level APIs)
 	
 	
 ## Getting Started
 
 1. Clone the repository, and cd into it:
 
-```bash
-$ git clone https://github.com/ornladios/ADIOS2-examples.git
-```
+    ```bash
+    $ git clone https://github.com/ornladios/ADIOS2-examples.git
+    ```
 
-```bash
-$ cd ADIOS2-Examples
-```
+    ```bash
+    $ cd ADIOS2-Examples
+    ```
 
-Meson and CMake build options are provided.
-In the future, we expect to distribute the adios2-examples as a package in conda, spack, dockerfile, etc.
+Meson and CMake build options are provided. In the future, we expect to distribute the adios2-examples as a package in conda, spack, dockerfile, etc.
 
 
 ## Installing with [Meson](https://mesonbuild.com/)
 
 1. Requirements:
 
-	- meson build >= 0.52.0, from `pip3 install meson` 
+     - meson build >= 0.52.0, from `pip3 install meson` 
 	- ninja
 	- mono-complete (might be already installed)
 	- mpi: openmpi or mpich
@@ -48,18 +48,21 @@ In the future, we expect to distribute the adios2-examples as a package in conda
 		- macOS: `brew install adios2`
 	- cmake >= v3.8 (optional) if adios2 is installed in non-system location (e.g. /opt)
 
-2. Build:
+
+2. Build, Test, Install:
 
     From the ADIOS2-Examples directory:
     
-    if adios2 standard installation (e.g. system location /usr, spack, conda, etc.) 
-    ```bash
-    $ meson build-meson --prefix=/path/
+    if adios2 is on a standard installation (e.g. system location /usr, spack, conda, etc.) 
+    
+    ```
+    $ meson build-meson --prefix=/path/to/install/adios2-examples
     ```
     
-    if adios2 uses a non-standard location
+    if adios2 is on a non-standard location (e.g. /opt)
+    
     ```bash
-    $ meson build-meson --prefix=/path/ -DADIOS2_DIR=/path/to/adios2/lib/cmake/adios2
+    $ meson build-meson --prefix=/path/to/install/adios2-examples -DADIOS2_DIR=/path/to/adios2/lib/cmake/adios2
     ```
     
     ```bash
@@ -78,28 +81,30 @@ In the future, we expect to distribute the adios2-examples as a package in conda
 		- macOS: `brew install adios2`
 	- cmake >= v3.8
 
-2. Build:
+2. Build, Test, Install:
 
-	From the ADIOS2-Examples directory:
+    From the ADIOS2-Examples directory:
 	
-    ```bash
+    ```
     $ mkdir build-cmake
     $ cd build-cmake
     ```
     
-    if adios2 standard installation (e.g. system location /usr, spack, conda, etc.) 
-    ```bash
+    if using an adios2 standard installation (e.g. system location /usr, spack, conda, etc.) 
+    
+    ```
     $ cmake -DCMAKE_INSTALL_PREFIX=/path/to/install/adios2-examples ..
     ```
     
-    if adios2 uses a non-standard location
-    ```bash
+    if using an adios2 non-standard location (e.g. /opt)
+    
+    ```
     $ cmake -DCMAKE_INSTALL_PREFIX=/path/to/install/adios2-examples \
             -DADIOS2_DIR=/path/to/adios2/lib/cmake/adios2 \
             ..
     ```
     
-    ```bash
+    ```
     $ make -j
     $ ctest
     $ make install
@@ -111,29 +116,49 @@ In the future, we expect to distribute the adios2-examples as a package in conda
    
    adios2-install:
    
-    * bin/
-    	- a2e_001_hello-world
-      	- a2e_001_hello-world_hl
-    	- ...
+    - bin/
+        - a2e_001_hello-world
+        - a2e_001_hello-world_hl
+    	   - ...
     	
-    * share/
+    - share/
         - ReadMe_001_hello-world.md
         
    Each executables starts with the `a2e_XYZ_*` prefix, where XYZ is the example number, 
    and a ReadMe.md file with instructions on how to run each example.
    
-   For example, to run 001_hello-world examples (assuming adios2-examples/bin is in the $PATH):
+   For example, to run 001_hello-world examples (assuming `adios2-examples/bin` is in the `$PATH`):
    
-	```bash
+    ```
     $ mpirun -n 4 a2e_001_hello-world
+    Hello World from ADIOS2
+    Hello World from ADIOS2
+    Hello World from ADIOS2
+    Hello World from ADIOS2
     ```
     
    or for the high-level C++ API
     
-    ```bash
-    $ mpirun -n 4 a2e_001_hello-world_hl  
+    ```
+    $ mpirun -n 4 a2e_001_hello-world_hl
+    Hello World from ADIOS2
+    Hello World from ADIOS2
+    Hello World from ADIOS2
+    Hello World from ADIOS2
     ```   
-   they would generate the corresponding bp files that can be inspected with [`bpls`](https://adios2.readthedocs.io/en/latest/ecosystem/utilities.html#bpls-inspecting-data) utility in ADIOS2
    
+   these would generate corresponding bp files that can be inspected with the [bpls utility](https://adios2.readthedocs.io/en/latest/ecosystem/utilities.html#bpls-inspecting-data) in ADIOS2.
    
+    ```
+    $ ls -d *.bp
+    hello-world.bp  hello-world_hl.bp
+    
+    $ bpls hello-world.bp -lav
+    File info:
+    of variables:  1
+    of attributes: 0
+    statistics:    Min / Max
+    
+    string   Greeting  scalar = "Hello World from ADIOS2"
+    ```
    
