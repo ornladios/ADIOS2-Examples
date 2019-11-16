@@ -1,0 +1,33 @@
+
+trigger:
+- master
+
+pr:
+  autoCancel: true
+  branches:
+    include:
+    - master
+
+resources:
+  containers:
+  - container: u18
+    image: ubuntu:18.04
+
+jobs:
+- job: RunInContainer
+  timeoutInMinutes: 90
+  
+  pool:
+    vmImage: 'ubuntu-18.04'
+
+  strategy:
+    matrix:
+      ubuntu18:
+        containerResource: u18
+
+  container: $[ variables['containerResource'] ]
+  
+  steps:
+    - bash: scripts/ci/azure/init.sh
+      name: Init
+      
