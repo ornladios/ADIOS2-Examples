@@ -1,3 +1,4 @@
+name: $(Build.SourceBranchName)-$(Rev:.r)
 
 trigger:
 - master
@@ -15,7 +16,7 @@ resources:
 
 jobs:
 - job: RunInContainer
-  timeoutInMinutes: 90
+  timeoutInMinutes: 5
   
   pool:
     vmImage: 'ubuntu-18.04'
@@ -28,6 +29,6 @@ jobs:
   container: $[ variables['containerResource'] ]
   
   steps:
-    - bash: scripts/ci/azure/init.sh
+    - bash: scripts/ci/azure/build.sh
       name: Init
       
