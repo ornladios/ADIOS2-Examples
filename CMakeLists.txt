@@ -28,6 +28,8 @@ find_package(MPI)
 add_definitions(-DOMPI_SKIP_MPICXX -DMPICH_SKIP_MPICXX)
 
 # place executables
+# define CMAKE_INSTALL_BINDIR 
+include(GNUInstallDirs)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 # set build type
