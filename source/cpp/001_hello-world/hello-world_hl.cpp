@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
     {
         std::cout << "ERROR: ADIOS2 exception: " << e.what() << "\n";
 #ifdef ADIOS2_HAVE_MPI
-        MPI_Abort(MPI_COMM_WORLD, 0);
+        MPI_Abort(MPI_COMM_WORLD, -1);
 #endif
     }
 
