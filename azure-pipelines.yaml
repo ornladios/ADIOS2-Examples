@@ -30,5 +30,6 @@ jobs:
   
   steps:
     - bash: scripts/ci/azure/build.sh
-      name: Init
+      name: Build_Test_Install
+    
       
