@@ -14,4 +14,8 @@ adios2_dep = dependency('adios2', required: true, version: '>=2.5.0',
 
 mpi_dep = dependency('mpi', language: 'cpp', required: false)
 
+# Needed for MPI tests
+mpiexec = find_program('mpiexec')
+nprocs = '2'
+
 subdir('source')
