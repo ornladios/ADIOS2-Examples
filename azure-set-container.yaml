@@ -1,3 +1,5 @@
+# Configuration file for building and pushing docker containers for adios2-examples
+# into dockerhub williamfgc
 
 trigger:
 - master

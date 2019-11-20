@@ -1,3 +1,5 @@
+# Configuration file for triggering CI on azure pipelines
+
 name: $(Build.SourceBranchName)-$(Rev:.r)
 
 trigger:
