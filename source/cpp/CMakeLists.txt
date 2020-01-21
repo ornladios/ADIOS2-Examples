@@ -5,3 +5,4 @@
 
 add_subdirectory(001_hello-world)
 add_subdirectory(002_basics)
+add_subdirectory(003_gray-scott)
