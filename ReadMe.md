@@ -161,4 +161,10 @@ Meson and CMake build options are provided. In the future, we expect to distribu
     
     string   Greeting  scalar = "Hello World from ADIOS2"
     ```
-   
+
+## Credits
+
+* William F Godoy godoywf@ornl.gov
+* Norbert Podhorszki pnb@ornl.gov
+* Keichi Takahashi keichi@is.naist.jp
+* Hiroshi Watanabe

@@ -3,7 +3,7 @@
 # accompanying file Copyright.txt for details.
 #------------------------------------------------------------------------------#
 
-project('ADIOS2Examples', 
+project('ADIOS2-Examples', 
          ['cpp', 'c'],
          license: 'Apache 2',
          version: '2.5.0',
