@@ -1,0 +1,34 @@
+package:
+  name: adios2-examples-openmpi
+  version: 2.5.0
+
+build:
+  number: 0
+  string: full
+
+source:
+  git_url: https://github.com/ornladios/adios2-examples.git
+  git_rev: master
+
+requirements:
+  build:
+    - python
+    - openmpi
+    - mpi4py
+    - numpy=1.15
+    - cmake
+    - adios2-openmpi
+  run:
+    - python
+    - openmpi
+    - mpi4py
+    - numpy=1.15
+    - adios2-openmpi
+    - matplotlib
+
+about:
+  home: https://github.com/ornladios/adios2-examples
+  license: Apache2
+  license_file: LICENSE
+  
+# build:  conda build -c conda-forge -c williamfgc .
