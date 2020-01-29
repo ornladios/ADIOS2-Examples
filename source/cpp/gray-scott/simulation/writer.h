@@ -4,8 +4,8 @@
 #include <adios2.h>
 #include <mpi.h>
 
-#include "gray-scott.h"
-#include "settings.h"
+#include "../../gray-scott/simulation/gray-scott.h"
+#include "../../gray-scott/simulation/settings.h"
 
 class Writer
 {

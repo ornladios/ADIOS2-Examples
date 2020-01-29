@@ -3,25 +3,19 @@
 # accompanying file Copyright.txt for details.
 #------------------------------------------------------------------------------#
 
-option(USE_TIMERS "Use profiling timers")
-if(USE_TIMERS)
-  message(STATUS "Enabling profiling timers")
-  add_definitions(-DENABLE_TIMERS)
-endif()
-
-add_executable(a2e_003_gray-scott
+add_executable(adios2-gray-scott
   simulation/main.cpp
   simulation/gray-scott.cpp
   simulation/settings.cpp
   simulation/writer.cpp
 )
-target_link_libraries(a2e_003_gray-scott adios2::adios2 MPI::MPI_C)
-install(TARGETS a2e_003_gray-scott 
+target_link_libraries(adios2-gray-scott adios2::adios2 MPI::MPI_C)
+install(TARGETS adios2-gray-scott 
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
-add_executable(a2e_003_pdf_calc analysis/pdf_calc.cpp)
-target_link_libraries(a2e_003_pdf_calc adios2::adios2 MPI::MPI_C)
-install(TARGETS a2e_003_pdf_calc 
+add_executable(adios2-pdf-calc analysis/pdf-calc.cpp)
+target_link_libraries(adios2-pdf-calc adios2::adios2 MPI::MPI_C)
+install(TARGETS adios2-pdf-calc 
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}) 
 
 install(FILES "adios2.xml" "visit-bp4.session" "visit-bp4.session.gui" 
@@ -31,5 +25,5 @@ install(FILES "adios2.xml" "visit-bp4.session" "visit-bp4.session.gui"
                            "plot/decomp.py" "plot/gsplot.py" "plot/pdfplot.py"
                            "cleanup.sh" "README.md"
         DESTINATION 
-        ${CMAKE_INSTALL_PREFIX}/share/adios2-examples/003_gray-scott)
+        ${CMAKE_INSTALL_PREFIX}/share/adios2-examples/gray-scott)
         

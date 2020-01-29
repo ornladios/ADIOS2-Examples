@@ -6,9 +6,9 @@
 #include <adios2.h>
 #include <mpi.h>
 
-#include "../common/timer.hpp"
-#include "gray-scott.h"
-#include "writer.h"
+#include "../../gray-scott/common/timer.hpp"
+#include "../../gray-scott/simulation/gray-scott.h"
+#include "../../gray-scott/simulation/writer.h"
 
 void print_io_settings(const adios2::IO &io)
 {

@@ -20,7 +20,7 @@
 #include <vtkSmartPointer.h>
 #include <vtkUnstructuredGrid.h>
 
-#include "../common/timer.hpp"
+#include "../../gray-scott/common/timer.hpp"
 
 vtkSmartPointer<vtkPolyData> read_mesh(const std::vector<double> &bufPoints,
                                        const std::vector<int> &bufCells,

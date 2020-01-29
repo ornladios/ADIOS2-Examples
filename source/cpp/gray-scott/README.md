@@ -10,14 +10,15 @@ v_t = Dv * (v_xx + v_yy + v_zz) + u * v^2 - (F + k) * v
 
 ## How to run
 
-Make sure MPI and ADIOS2 are installed and that the PYTHONPATH includes the ADIOS2 package.
-Make sure the adios2-examples/bin installation directory is in the PATH.
+Make sure MPI and ADIOS2 are installed and that the `PYTHONPATH` includes the ADIOS2 package.
+Make sure the adios2-examples/bin installation directory is in the `PATH` (conda and spack installations should take care of this aspect).
 
-In the adios2-examples installation directory:
+From a scratch directory copy the config files from your installation of adios2-examples:
 
 ```
-$ cd share/adios2-examples/003_gray-scott
-$ mpirun -n 4 a2e_003_gray-scott settings-files.json
+$ cp -r adios2-examples-install-prefix/share/adios2-examples/gray-scott .
+$ cd gray-scott 
+$ mpirun -n 4 gray-scott settings-files.json
 ========================================
 grid:             64x64x64
 steps:            1000
@@ -46,15 +47,15 @@ $ bpls -l gs.bp
   int32_t  step  100*scalar = 10 / 1000
 
 
-$ python3 plot/gsplot.py -i gs.bp
+$ python3 gsplot.py -i gs.bp
 
 ```
 
 ## Analysis example how to run
 
 ```
-$ mpirun -n 4 a2e_003_gray-scott settings-files.json
-$ mpirun -n 2 a2e_003_pdf_calc gs.bp pdf.bp 100
+$ mpirun -n 4 gray-scott settings-files.json
+$ mpirun -n 2 pdf-calc gs.bp pdf.bp 100
 $ bpls -l pdf.bp
   double   U/bins  100*{100} = 0.0907758 / 0.991742
   double   U/pdf   100*{64, 100} = 0 / 4096
@@ -109,16 +110,16 @@ In adios2.xml, change all IO groups' engine to SST.
 
 Launch the pipeline in 4 separate terminals:
 ```
-$ mpirun -n 4 a2e_003_gray-scott settings-staging.json
-$ mpirun -n 1 a2e_003_pdf_calc gs.bp pdf.bp 100
+$ mpirun -n 4 gray-scott settings-staging.json
+$ mpirun -n 1 pdf-calc gs.bp pdf.bp 100
 $ mpirun -n 1 python3 pdfplot.py -i pdf.bp
 $ mpirun -n 1 python3 gsplot.py -i gs.bp
 ```
 
 MPMD mode run in a single terminal:
 ```
-$ mpirun -n 4 a2e_003_gray-scott settings-staging.json : \
-         -n 1 a2e_003_pdf_calc gs.bp pdf.bp 100 :           \
+$ mpirun -n 4 gray-scott settings-staging.json : \
+         -n 1 pdf-calc gs.bp pdf.bp 100 :           \
          -n 1 python3 pdfplot.py -i pdf.bp :         \
          -n 1 python3 gsplot.py -i gs.bp
 ```

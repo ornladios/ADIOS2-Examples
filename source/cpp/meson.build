@@ -3,6 +3,6 @@
 # accompanying file Copyright.txt for details.
 #------------------------------------------------------------------------------#
 
-subdir('001_hello-world')
-subdir('002_basics')
-subdir('003_gray-scott')
+subdir('basics')
+subdir('gray-scott')
+subdir('hello-world')

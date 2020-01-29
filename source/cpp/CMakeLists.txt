@@ -3,6 +3,6 @@
 # accompanying file Copyright.txt for details.
 #------------------------------------------------------------------------------#
 
-add_subdirectory(001_hello-world)
-add_subdirectory(002_basics)
-add_subdirectory(003_gray-scott)
+add_subdirectory(basics)
+add_subdirectory(gray-scott)
+add_subdirectory(hello-world)

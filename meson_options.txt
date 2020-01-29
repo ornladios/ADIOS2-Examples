@@ -3,5 +3,5 @@
 # accompanying file Copyright.txt for details.
 #------------------------------------------------------------------------------#
 
-option('ADIOS2_DIR', type : 'string', value : '/usr', description : 'ADIOS2 location')
+option('ADIOS2_DIR', type : 'string', value : '/opt', description : 'ADIOS2 location')
 

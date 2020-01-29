@@ -2,8 +2,8 @@
  * Distributed under the OSI-approved Apache License, Version 2.0.  See
  * accompanying file Copyright.txt for details.
  *
- * hello-world.cpp : adios2 high-level API example to write and read a
- *                   std::string Variable with a greeting
+ * hello-world-hl.cpp : adios2 high-level API example to write and read a
+ *                      std::string Variable with a greeting
  *
  *  Created on: Nov 14, 2019
  *      Author: William F Godoy godoywf@ornl.gov
@@ -18,9 +18,9 @@
 void writer(const std::string &greeting)
 {
 #ifdef ADIOS2_HAVE_MPI
-    adios2::fstream out("hello-world_hl.bp", adios2::fstream::out, MPI_COMM_WORLD);
+    adios2::fstream out("hello-world-hl-cpp.bp", adios2::fstream::out, MPI_COMM_WORLD);
 #else
-    adios2::fstream out("hello-world_hl.bp", adios2::fstream::out);
+    adios2::fstream out("hello-world-hl-cpp.bp", adios2::fstream::out);
 #endif
 
     out.write("Greeting", greeting);
@@ -30,9 +30,9 @@ void writer(const std::string &greeting)
 std::string reader()
 {
 #ifdef ADIOS2_HAVE_MPI
-    adios2::fstream in("hello-world_hl.bp", adios2::fstream::in, MPI_COMM_WORLD);
+    adios2::fstream in("hello-world-hl-cpp.bp", adios2::fstream::in, MPI_COMM_WORLD);
 #else
-    adios2::fstream in("hello-world_hl.bp", adios2::fstream::in);
+    adios2::fstream in("hello-world-hl-cpp.bp", adios2::fstream::in);
 #endif
 
     const std::vector<std::string> greetings = in.read<std::string>("Greeting");

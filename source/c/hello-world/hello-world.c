@@ -17,19 +17,19 @@
 
 void writer(adios2_adios *adios, const char *greeting)
 {
-    adios2_io *io = adios2_declare_io(adios, "hello-world_writer");
+    adios2_io *io = adios2_declare_io(adios, "hello-world-writer");
     adios2_variable *var_greeting = adios2_define_variable(
         io, "Greeting", adios2_type_string, 0, NULL, NULL, NULL, adios2_constant_dims_true);
 
-    adios2_engine *engine = adios2_open(io, "hello-world_c.bp", adios2_mode_write);
+    adios2_engine *engine = adios2_open(io, "hello-world-c.bp", adios2_mode_write);
     adios2_put(engine, var_greeting, greeting, adios2_mode_deferred);
     adios2_close(engine);
 }
 
 void reader(adios2_adios *adios, char *greeting)
 {
-    adios2_io *io = adios2_declare_io(adios, "hello-world_reader");
-    adios2_engine *engine = adios2_open(io, "hello-world_c.bp", adios2_mode_read);
+    adios2_io *io = adios2_declare_io(adios, "hello-world-reader");
+    adios2_engine *engine = adios2_open(io, "hello-world-c.bp", adios2_mode_read);
     adios2_variable *var_greeting = adios2_inquire_variable(io, "Greeting");
     adios2_get(engine, var_greeting, greeting, adios2_mode_deferred);
     adios2_close(engine);
