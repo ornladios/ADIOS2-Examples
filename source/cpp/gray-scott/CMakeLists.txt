@@ -23,7 +23,10 @@ install(FILES "adios2.xml" "visit-bp4.session" "visit-bp4.session.gui"
                            "simulation/settings-files.json"
                            "simulation/settings-staging.json"
                            "plot/decomp.py" "plot/gsplot.py" "plot/pdfplot.py"
-                           "cleanup.sh" "README.md"
-        DESTINATION 
-        ${CMAKE_INSTALL_PREFIX}/share/adios2-examples/gray-scott)
-        
+                           "README.md"
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/share/adios2-examples/gray-scott) 
+
+
+install(PROGRAMS "cleanup.sh" 
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/share/adios2-examples/gray-scott) 
+
