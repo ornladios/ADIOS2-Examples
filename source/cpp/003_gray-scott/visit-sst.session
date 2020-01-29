@@ -4537,10 +4537,10 @@
         </Object>
         <Object name="ViewerSubject">
             <Object name="SourceMap">
-                <Field name="SOURCE00" type="string">localhost:/home/adios/adiosvm/Tutorial/gray-scott/gs.bp.sst</Field>
+                <Field name="SOURCE00" type="string">localhost:gs.bp.sst</Field>
             </Object>
             <Object name="SourcePlugins">
-                <Field name="localhost:/home/adios/adiosvm/Tutorial/gray-scott/gs.bp.sst" type="string">ADIOS2_1.0</Field>
+                <Field name="localhost:gs.bp.sst" type="string">ADIOS2_1.0</Field>
             </Object>
             <Object name="DatabaseCorrelationList">
                 <Field name="needPermission" type="bool">true</Field>
