@@ -138,38 +138,34 @@ Each executable under `bin` starts with the `adios2-` prefix. Whereas, each `sha
 
 For example, to run `hello-world` examples (assuming `adios2-examples/bin` is in the `$PATH`):
 
-    ```
     $ mpirun -n 4 adios2-hello-world-cpp
     Hello World from ADIOS2
     Hello World from ADIOS2
     Hello World from ADIOS2
     Hello World from ADIOS2
-    ```
 
 or for the high-level C++ API:
 
-    ```
     $ mpirun -n 4 adios2-hello-world-hl-cpp
     Hello World from ADIOS2
     Hello World from ADIOS2
     Hello World from ADIOS2
     Hello World from ADIOS2
-    ```
 
 these runs would generate corresponding bp files that can be inspected with the [bpls utility](https://adios2.readthedocs.io/en/latest/ecosystem/utilities.html#bpls-inspecting-data) in ADIOS2.
 
-    ```
-    $ ls -d *.bp
-    hello-world.bp  hello-world_hl.bp
 
-    $ bpls hello-world.bp -lav
+    $ ls -d *.bp
+    hello-world-cpp.bp  hello-world-hl-cpp.bp
+
+    $ bpls hello-world-cpp.bp -lav
     File info:
     of variables:  1
     of attributes: 0
     statistics:    Min / Max
 
     string   Greeting  scalar = "Hello World from ADIOS2"
-    ```
+
 
 For a more elaborated use case see [gray-scott](https://github.com/ornladios/ADIOS2-Examples/tree/master/source/cpp/gray-scott).
 
