@@ -1,14 +1,15 @@
 package:
-  name: adios2-examples-openmpi
+  name: adios2-examples
   version: 2.5.0
 
 build:
   number: 0
-  string: full
+  string: openmpi
 
 source:
   git_url: https://github.com/ornladios/adios2-examples.git
-  git_rev: master
+  git_rev: v2.5.0
+  git_depth: 1
 
 requirements:
   build:
@@ -17,13 +18,13 @@ requirements:
     - mpi4py
     - numpy=1.15
     - cmake
-    - adios2-openmpi
+    - adios2-openmpi=2.5.0=full
   run:
     - python
     - openmpi
     - mpi4py
     - numpy=1.15
-    - adios2-openmpi
+    - adios2-openmpi=2.5.0=full
     - matplotlib
 
 about:
