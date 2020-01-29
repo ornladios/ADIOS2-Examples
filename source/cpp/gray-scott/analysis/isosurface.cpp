@@ -21,7 +21,7 @@
 #include <vtkSmartPointer.h>
 #include <vtkXMLPolyDataWriter.h>
 
-#include "../common/timer.hpp"
+#include "../../gray-scott/common/timer.hpp"
 
 vtkSmartPointer<vtkPolyData>
 compute_isosurface(const adios2::Variable<double> &varField,

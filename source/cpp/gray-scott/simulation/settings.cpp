@@ -1,7 +1,8 @@
+#include "../../gray-scott/simulation/settings.h"
+
 #include <fstream>
 
-#include "json.hpp"
-#include "settings.h"
+#include "../../gray-scott/simulation/json.hpp"
 
 void to_json(nlohmann::json &j, const Settings &s)
 {

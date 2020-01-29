@@ -2,11 +2,12 @@
 // code available at:
 // https://github.com/kaityo256/sevendayshpc/tree/master/day5
 
+#include "../../gray-scott/simulation/gray-scott.h"
+
 #include <mpi.h>
 #include <random>
 #include <vector>
 
-#include "gray-scott.h"
 
 GrayScott::GrayScott(const Settings &settings, MPI_Comm comm)
     : settings(settings), comm(comm), rand_dev(), mt_gen(rand_dev()),

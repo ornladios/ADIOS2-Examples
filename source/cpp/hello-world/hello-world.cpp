@@ -17,18 +17,18 @@
 
 void writer(adios2::ADIOS &adios, const std::string &greeting)
 {
-    adios2::IO io = adios.DeclareIO("hello-world_writer");
+    adios2::IO io = adios.DeclareIO("hello-world-writer");
     adios2::Variable<std::string> varGreeting = io.DefineVariable<std::string>("Greeting");
 
-    adios2::Engine writer = io.Open("hello-world.bp", adios2::Mode::Write);
+    adios2::Engine writer = io.Open("hello-world-cpp.bp", adios2::Mode::Write);
     writer.Put(varGreeting, greeting);
     writer.Close();
 }
 
 std::string reader(adios2::ADIOS &adios)
 {
-    adios2::IO io = adios.DeclareIO("hello-world_reader");
-    adios2::Engine reader = io.Open("hello-world.bp", adios2::Mode::Read);
+    adios2::IO io = adios.DeclareIO("hello-world-reader");
+    adios2::Engine reader = io.Open("hello-world-cpp.bp", adios2::Mode::Read);
     adios2::Variable<std::string> varGreeting = io.InquireVariable<std::string>("Greeting");
     std::string greeting;
     reader.Get(varGreeting, greeting);

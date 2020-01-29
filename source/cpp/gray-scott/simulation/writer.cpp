@@ -1,4 +1,4 @@
-#include "writer.h"
+#include "../../gray-scott/simulation/writer.h"
 
 void define_bpvtk_attribute(const Settings &s, adios2::IO &io)
 {

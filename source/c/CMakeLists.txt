@@ -1,1 +1,6 @@
-add_subdirectory(001_hello-world)
+#------------------------------------------------------------------------------#
+# Distributed under the OSI-approved Apache License, Version 2.0.  See
+# accompanying file Copyright.txt for details.
+#------------------------------------------------------------------------------#
+
+add_subdirectory(hello-world)
