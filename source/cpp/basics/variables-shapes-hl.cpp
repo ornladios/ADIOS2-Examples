@@ -2,7 +2,7 @@
  * Distributed under the OSI-approved Apache License, Version 2.0.  See
  * accompanying file Copyright.txt for details.
  *
- * variables-shapes_hl.cpp : adios2 high-level API example to write and read
+ * variables-shapes-hl.cpp : adios2 high-level API example to write and read
  *                   supported Variables shapes using stepping (streaming) mode
  *
  *  Created on: Nov 14, 2019
