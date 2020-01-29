@@ -16,9 +16,9 @@ Make sure the adios2-examples/bin installation directory is in the `PATH` (conda
 From a scratch directory copy the config files from your installation of adios2-examples:
 
 ```
-$ cp -r adios2-examples-install-prefix/share/adios2-examples/gray-scott .
-$ cd gray-scott 
-$ mpirun -n 4 gray-scott settings-files.json
+$ cp -r <adios2-examples-install-prefix>/share/adios2-examples/gray-scott .
+$ cd gray-scott
+$ mpirun -n 4 adios2-gray-scott settings-files.json
 ========================================
 grid:             64x64x64
 steps:            1000
@@ -54,8 +54,8 @@ $ python3 gsplot.py -i gs.bp
 ## Analysis example how to run
 
 ```
-$ mpirun -n 4 gray-scott settings-files.json
-$ mpirun -n 2 pdf-calc gs.bp pdf.bp 100
+$ mpirun -n 4 adios2-gray-scott settings-files.json
+$ mpirun -n 2 adios2-pdf-calc gs.bp pdf.bp 100
 $ bpls -l pdf.bp
   double   U/bins  100*{100} = 0.0907758 / 0.991742
   double   U/pdf   100*{64, 100} = 0 / 4096
@@ -110,16 +110,16 @@ In adios2.xml, change all IO groups' engine to SST.
 
 Launch the pipeline in 4 separate terminals:
 ```
-$ mpirun -n 4 gray-scott settings-staging.json
-$ mpirun -n 1 pdf-calc gs.bp pdf.bp 100
+$ mpirun -n 4 adios2-gray-scott settings-staging.json
+$ mpirun -n 1 adios2-pdf-calc gs.bp pdf.bp 100
 $ mpirun -n 1 python3 pdfplot.py -i pdf.bp
 $ mpirun -n 1 python3 gsplot.py -i gs.bp
 ```
 
 MPMD mode run in a single terminal:
 ```
-$ mpirun -n 4 gray-scott settings-staging.json : \
-         -n 1 pdf-calc gs.bp pdf.bp 100 :           \
+$ mpirun -n 4 adios2-gray-scott settings-staging.json : \
+         -n 1 adios2-pdf-calc gs.bp pdf.bp 100 :           \
          -n 1 python3 pdfplot.py -i pdf.bp :         \
          -n 1 python3 gsplot.py -i gs.bp
 ```
