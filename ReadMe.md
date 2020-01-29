@@ -35,7 +35,7 @@ This is the preferred method as it includes all the dependencies (e.g. adios2, o
     ```
     $ conda activate
     $ conda create --name adios2-examples
-    $ conda activate adios2-examples 
+    $ conda activate adios2-examples
     $ conda install adios2-examples -c williamfgc -c conda-forge
     ```
 
@@ -124,14 +124,14 @@ The final installation structure of the adios2-examples package include a bin di
 
 adios2-examples installation structure:
 
-    - bin/
+    bin/
         adios2-hello-world
         adios2-hello-world-hl
         ...
         adios2-gray-scott
-        adios2-pdf_calc
+        adios2-pdf-calc
 
-    - share/adios2-examples/
+    share/adios2-examples/
         gray-scott
 
 Each executable under `bin` starts with the `adios2-` prefix. Whereas, each `share/adios2-examples` directory has a ReadMe.md file with instructions.
