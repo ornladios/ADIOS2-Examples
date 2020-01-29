@@ -1,6 +1,6 @@
 package:
   name: adios2-examples
-  version: 2.5.0-rc2
+  version: 2.5.0_rc2
 
 build:
   number: 0
