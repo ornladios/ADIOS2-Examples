@@ -3,4 +3,6 @@
 # accompanying file Copyright.txt for details.
 #------------------------------------------------------------------------------#
 
-add_subdirectory(hello-world)
+if (ADIOS2_HAVE_MPI)
+    add_subdirectory(hello-world)
+endif()

@@ -3,7 +3,10 @@
 # accompanying file Copyright.txt for details.
 #------------------------------------------------------------------------------#
 
-add_subdirectory(basics)
-add_subdirectory(gray-scott)
-add_subdirectory(hello-world)
-add_subdirectory(korteweg-de-vries)
+if (ADIOS2_HAVE_MPI)
+    add_subdirectory(basics)
+    add_subdirectory(gray-scott)
+    add_subdirectory(hello-world)
+else()
+    add_subdirectory(korteweg-de-vries)
+endif()

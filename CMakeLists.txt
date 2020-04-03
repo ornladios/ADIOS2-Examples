@@ -22,10 +22,11 @@ endif()
 
 # Dependencies
 find_package(ADIOS2 REQUIRED 2.5.0)
-find_package(MPI)
-
-# Workaround for various MPI implementations forcing the link of C++ bindings
-add_definitions(-DOMPI_SKIP_MPICXX -DMPICH_SKIP_MPICXX)
+if (ADIOS2_HAVE_MPI)
+    find_package(MPI)
+    # Workaround for various MPI implementations forcing the link of C++ bindings
+    add_definitions(-DOMPI_SKIP_MPICXX -DMPICH_SKIP_MPICXX)
+endif()
 
 # place executables
 # define CMAKE_INSTALL_BINDIR 
