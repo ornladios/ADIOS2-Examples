@@ -3,7 +3,6 @@
 # accompanying file Copyright.txt for details.
 #------------------------------------------------------------------------------#
 
-add_subdirectory(basics)
-add_subdirectory(gray-scott)
-add_subdirectory(hello-world)
-add_subdirectory(korteweg-de-vries)
+add_executable(KdV KdV.cpp)
+target_link_libraries(KdV adios2)
+
