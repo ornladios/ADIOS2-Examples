@@ -4,5 +4,5 @@
 #------------------------------------------------------------------------------#
 
 add_executable(KdV KdV.cpp)
-target_link_libraries(KdV adios2)
+target_link_libraries(KdV adios2::cxx11)
 

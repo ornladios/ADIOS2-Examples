@@ -14,19 +14,14 @@ if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_CURRENT_BINARY_DIR)
     "separate from the source directory")
 endif()
 
-project(ADIOS2Examples VERSION 2.5.0)
+project(ADIOS2Examples)
 # to enable -DADIOS2_ROOT in modern cmake
 if(POLICY CMP0074)
   cmake_policy(SET CMP0074 NEW)
 endif()
 
 # Dependencies
-find_package(ADIOS2 REQUIRED 2.5.0)
-if (ADIOS2_HAVE_MPI)
-    find_package(MPI)
-    # Workaround for various MPI implementations forcing the link of C++ bindings
-    add_definitions(-DOMPI_SKIP_MPICXX -DMPICH_SKIP_MPICXX)
-endif()
+find_package(ADIOS2 REQUIRED)
 
 # place executables
 # define CMAKE_INSTALL_BINDIR 

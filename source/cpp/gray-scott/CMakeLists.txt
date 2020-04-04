@@ -9,12 +9,12 @@ add_executable(adios2-gray-scott
   simulation/settings.cpp
   simulation/writer.cpp
 )
-target_link_libraries(adios2-gray-scott adios2::adios2 MPI::MPI_C)
+target_link_libraries(adios2-gray-scott adios2::cxx11_mpi)
 install(TARGETS adios2-gray-scott 
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 add_executable(adios2-pdf-calc analysis/pdf-calc.cpp)
-target_link_libraries(adios2-pdf-calc adios2::adios2 MPI::MPI_C)
+target_link_libraries(adios2-pdf-calc adios2::cxx11_mpi)
 install(TARGETS adios2-pdf-calc 
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}) 
 
