@@ -4,6 +4,6 @@
 #------------------------------------------------------------------------------#
 
 add_executable(adios2-hello-world-c hello-world.c)
-target_link_libraries(adios2-hello-world-c adios2::c_mpi)
+target_link_libraries(adios2-hello-world-c adios2::c_mpi MPI::MPI_C)
 add_test(NAME hello-world-c COMMAND mpirun -np ${NPROCS} $<TARGET_FILE:adios2-hello-world-c>)
 install(TARGETS adios2-hello-world-c RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
