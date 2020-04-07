@@ -180,5 +180,13 @@ int main(int argc, char **argv)
 
     double dx = 1.0 / N;
     double dt = 27 * dx * dx * dx / 4;
-    KdV<double>(N, dt, t_max, delta);
+    try
+    {
+        KdV<double>(N, dt, t_max, delta);
+    }
+    catch (std::exception const & e)
+    {
+        std::cerr << "Caught exception from KdV call: " << e.what() << "\n";
+        return 1;
+    }
 }
