@@ -89,7 +89,7 @@ void KdV(int64_t N, Real dt, Real t_max, Real delta = 0.022)
     }
 
     adios_engine.BeginStep();
-    adios_engine.Put(u_variable, u0.data(), adios2::Mode::Sync);
+    adios_engine.Put(u_variable, u0.data());
     adios_engine.EndStep();
     Real original_momentum = momentum(u0);
     std::vector<Real> u1(N);
@@ -142,12 +142,13 @@ void KdV(int64_t N, Real dt, Real t_max, Real delta = 0.022)
         {
             display_progress(double(j + 1) / (M - 1));
             adios_engine.BeginStep();
-            adios_engine.Put(u_variable, u2.data(), adios2::Mode::Sync);
+            adios_engine.Put(u_variable, u2.data());
             adios_engine.EndStep();
         }
         u0 = u1;
         u1 = u2;
     }
+    adios_engine.Close();
 }
 
 int main(int argc, char **argv)
