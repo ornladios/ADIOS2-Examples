@@ -2,6 +2,7 @@
 #include <vector>
 #include <array>
 #include <cmath>
+#include <cassert>
 #include <algorithm>
 #include <adios2.h>
 
