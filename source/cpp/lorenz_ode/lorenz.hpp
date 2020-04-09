@@ -8,14 +8,17 @@
 #include <algorithm>
 
 
+// Solves the Lorenz system using Taylor methods.
+// See: https://en.wikipedia.org/wiki/Lorenz_system
+// and Corliss, "A Graduate Introduction to Numerical Methods" (https://doi.org/10.1007/978-1-4614-8453-0)
+// for an introduction to Taylor methods for ODEs.
+
 template<typename Real>
 class lorenz {
 public:
-    lorenz(Real sigma, Real beta, Real rho,
-           std::array<Real, 3> const & initial_conditions, Real tmax, Real absolute_error_goal)
+    lorenz(const Real sigma, const Real beta, const Real rho,
+           std::array<Real, 3> const & initial_conditions, const Real tmax, const Real absolute_error_goal)
     {
-        static_assert(sizeof(std::array<Real, 7>)==7*sizeof(Real),
-                             "The std::array on your system does not have the proper layout to be correctly serialized in ADIOS2.");
         using std::sqrt;
         using std::abs;
         using std::cbrt;
@@ -43,7 +46,7 @@ public:
             // ∆t must satisfy three constraints:
             // ∆t^2 < 2µ/|ddot(x)|, ∆t^2 < 2µ/|ddot(y)|, ∆t^2 < 2µ/|ddot(z)|.
             // where µ = absolute_error_goal.
-            Real m = std::min({abs(ddotx), abs(ddoty), abs(ddotz)});
+            const Real m = std::min({abs(ddotx), abs(ddoty), abs(ddotz)});
             Real dt;
             // If all second derivaties are zero, we're actually *more* accurate:
             if (m==0)
@@ -55,10 +58,13 @@ public:
                 dt = sqrt(2*absolute_error_goal/m);
             }
 
+            // Taylor series:
             t += dt;
             x += dt*dotx + dt*dt*ddotx/2;
             y += dt*doty + dt*dt*ddoty/2;
             z += dt*dotz + dt*dt*ddotz/2;
+
+            // Now compute the derivatives at the new location:
             dotx = sigma*(y - x);
             doty = x*(rho - z) - y;
             dotz = x*y - beta*z;
@@ -66,6 +72,7 @@ public:
             ddoty = dotx*(rho - z) - x*dotz - doty;
             ddotz = dotx*y + x*doty - beta*dotz;
 
+            // And store the state:
             state_.emplace_back(std::array<Real, 7>{t, x, y, z, dotx, doty, dotz});
         }
     }
