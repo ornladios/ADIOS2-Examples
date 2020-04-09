@@ -40,7 +40,6 @@ void solve_lorenz_ivp()
                         assert(skeleton[i][j] == p[7*i+j]);
                     }
                 }
-
                 const std::string variable = "u" + std::to_string(i) + std::to_string(j) + std::to_string(k);
                 auto state_variable = io.DefineVariable<Real>(variable, {7*skeleton.size()}, {0}, {7*skeleton.size()}, adios2::ConstantDims);
                 adios_engine.Put(state_variable, p, adios2::Mode::Sync);
@@ -58,5 +57,14 @@ int main() {
     catch (std::exception const & e)
     {
         std::cerr << "Caught an exception solving Lorenz ODE: " << e.what() << "\n";
+    }
+
+    try
+    {
+        test_lorenz<double>();
+    }
+    catch (std::exception const & e)
+    {
+        std::cout << "Caught and exception from the Lorenz unit tests: " << e.what() << "\n";
     }
 }

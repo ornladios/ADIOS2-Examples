@@ -81,7 +81,6 @@ public:
     lorenz(std::vector<std::array<Real, 7>> && state) : state_{std::move(state)}
     {};
 
-    // Potential unit test: ICS {x(0), y(0), z(0)} = {0,0,C} => x(t) = 0, y(t) = 0, z(t) = Cexp(-βt).
     std::array<Real, 3> operator()(Real t) const {
         Real nan = std::numeric_limits<Real>::quiet_NaN();
         return {nan, nan, nan};
@@ -95,5 +94,40 @@ public:
 private:
     std::vector<std::array<Real, 7>> state_;
 };
+
+template<typename Real>
+void test_lorenz()
+{
+    // Kinda ridiculous to run tests this way,
+    // but I don't want to introduce a dependency on a unit test framework into this repo.
+    // Test 1: If x(0) = y(0) = 0, then x(t) = y(t) = 0 and z(t) = z(0)exp(-βt).
+    Real sigma = 10;
+    Real beta = Real(8)/Real(3);
+    Real rho = 28;
+    Real tmax = 10;
+    Real absolute_error = 1e-5;
+    const std::array<Real, 3> initial_conditions{0, 0, Real(1)};
+    auto solution = lorenz<double>(sigma, beta, rho, initial_conditions, tmax, absolute_error);
+    auto const & skeleton = solution.state();
+
+    for (auto const & s : skeleton) {
+        Real t = s[0];
+        Real x = s[1];
+        Real y = s[2];
+        Real z = s[3];
+        if (abs(x) > std::numeric_limits<Real>::epsilon()) {
+            throw std::logic_error("x < eps doesn't hold");
+        }
+        if (abs(y) > std::numeric_limits<Real>::epsilon()) {
+            throw std::logic_error("y < eps doesn't hold");
+        }
+        Real expected = std::exp(-beta*t);
+        if (abs(expected - z) > 100*absolute_error) {
+            std::cerr << "Expected z = " << expected << "\n";
+            std::cerr << "Computed z = " << z << "\n";
+            throw std::logic_error("z(t) = exp(-βt) doesn't hold");
+        }
+    }
+}
 
 #endif
