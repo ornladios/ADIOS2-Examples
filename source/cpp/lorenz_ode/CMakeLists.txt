@@ -3,8 +3,8 @@
 # accompanying file Copyright.txt for details.
 #------------------------------------------------------------------------------#
 
-add_subdirectory(basics)
-add_subdirectory(gray-scott)
-add_subdirectory(hello-world)
-add_subdirectory(korteweg-de-vries)
-add_subdirectory(lorenz_ode)
+add_executable(lorenz_writer lorenz_writer.cpp)
+target_link_libraries(lorenz_writer adios2::adios2 MPI::MPI_C)
+
+add_executable(lorenz_reader lorenz_reader.cpp)
+target_link_libraries(lorenz_reader adios2::adios2 MPI::MPI_C)
