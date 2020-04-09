@@ -69,6 +69,14 @@ void read_solution()
 
         double* d = v[0].data();
         adios_engine.Get(key, d, adios2::Mode::Sync);
+        std::vector<Real> times(v.size());
+        for (size_t i = 0; i < v.size(); ++i) {
+            times[i] = v[i][0];
+        }
+        // One property of the data:
+        if (!std::is_sorted(times.begin(), times.end())) {
+            std::cerr << "Times should be sorted in increasing order t0 < t1 < ... < tn\n";
+        }
     }
     adios_engine.Close();
 }
