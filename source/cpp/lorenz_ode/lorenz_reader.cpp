@@ -65,9 +65,7 @@ void read_solution()
             continue;
         }
         size_t states = shape[0]/7;
-        if (v.capacity() < states) {
-            v.reserve(states);
-        }
+        v.resize(states);
 
         double* d = v[0].data();
         adios_engine.Get(key, d, adios2::Mode::Sync);
