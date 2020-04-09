@@ -34,17 +34,16 @@ void solve_lorenz_ivp()
                 auto solution = lorenz<double>(sigma, beta, rho, initial_conditions, tmax, absolute_error);
                 auto const & skeleton = solution.state();
                 // This is just being *ultra* cautious; this double checks that the memory layout is contiguous.
+                const double * const p = skeleton[0].data();
                 for (size_t i = 0; i < skeleton.size(); ++i) {
-                    const double * const p = skeleton[0].data();
                     for (size_t j = 0; j < 7; ++j) {
                         assert(skeleton[i][j] == p[7*i+j]);
                     }
                 }
+
                 const std::string variable = "u" + std::to_string(i) + std::to_string(j) + std::to_string(k);
                 auto state_variable = io.DefineVariable<Real>(variable, {7*skeleton.size()}, {0}, {7*skeleton.size()}, adios2::ConstantDims);
-                adios_engine.BeginStep();
-                adios_engine.Put(state_variable, skeleton[0].data());
-                adios_engine.EndStep();
+                adios_engine.Put(state_variable, p, adios2::Mode::Sync);
             }
         }
     }

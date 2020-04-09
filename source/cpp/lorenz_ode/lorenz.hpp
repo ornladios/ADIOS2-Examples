@@ -81,6 +81,12 @@ public:
     lorenz(std::vector<std::array<Real, 7>> && state) : state_{std::move(state)}
     {};
 
+    // Potential unit test: ICS {x(0), y(0), z(0)} = {0,0,C} => x(t) = 0, y(t) = 0, z(t) = Cexp(-βt).
+    std::array<Real, 3> operator()(Real t) const {
+        Real nan = std::numeric_limits<Real>::quiet_NaN();
+        return {nan, nan, nan};
+    }
+
     const std::vector<std::array<Real, 7>>& state() const {
         return state_;
     }
