@@ -143,7 +143,7 @@ int main(int argc, char *argv[])
 
     const std::string input_fname(argv[1]);
 
-    adios2::ADIOS adios("adios2.xml", comm, adios2::DebugON);
+    adios2::ADIOS adios("adios2.xml", comm);
 
     adios2::IO inIO = adios.DeclareIO("IsosurfaceOutput");
     adios2::Engine reader = inIO.Open(input_fname, adios2::Mode::Read);
