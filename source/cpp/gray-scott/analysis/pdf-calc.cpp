@@ -167,7 +167,7 @@ int main(int argc, char *argv[])
 
     {
         // adios2 io object and engine init
-        adios2::ADIOS ad("adios2.xml", comm, adios2::DebugON);
+        adios2::ADIOS ad("adios2.xml", comm);
 
         // IO objects for reading and writing
         adios2::IO reader_io = ad.DeclareIO("SimulationOutput");

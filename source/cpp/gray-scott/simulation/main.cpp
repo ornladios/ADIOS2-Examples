@@ -67,7 +67,7 @@ int main(int argc, char **argv)
     GrayScott sim(settings, comm);
     sim.init();
 
-    adios2::ADIOS adios(settings.adios_config, comm, adios2::DebugON);
+    adios2::ADIOS adios(settings.adios_config, comm);
     adios2::IO io_main = adios.DeclareIO("SimulationOutput");
     adios2::IO io_ckpt = adios.DeclareIO("SimulationCheckpoint");
 
