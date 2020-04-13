@@ -77,13 +77,15 @@ void read_solution()
             std::cerr << "The size of a 7D array of structs must be a multiple of 7.\n";
             continue;
         }
-        size_t states = shape[0]/7;
-        std::vector<std::array<Real, 7>> v(states);
+        size_t num_states = shape[0]/7;
+        std::vector<std::array<Real, 7>> v(num_states);
         adios_engine.Get(key, v[0].data(), adios2::Mode::Sync);
 
         auto solution = lorenz(std::move(v));
-        std::array<Real, 3> u = solution(solution.tmax());
-        std::cout << "Last position is u(" << solution.tmax() << ") = {" << u[0] << ", " << u[1] << ", " << u[2] << "}\n";
+        std::array<Real, 3> u = solution(Real(0));
+        std::cout << "First position is u(0) = {" << u[0] << ", " << u[1] << ", " << u[2] << "}\n";
+        u = solution(solution.tmax());
+        std::cout << "Last position is u(" << solution.tmax() << ") = {" << u[0] << ", " << u[1] << ", " << u[2] << "}\n\n\n";
         // For more information than we want:
         // std::cout << solution << "\n";
 

@@ -32,7 +32,7 @@ void solve_lorenz_ivp()
             for (size_t k = 0; k < paths; ++k) {
                 const std::array<Real, 3> initial_conditions{Real(i),Real(j),Real(k)};
                 auto solution = lorenz<double>(sigma, beta, rho, initial_conditions, tmax, absolute_error);
-                auto const & skeleton = solution.state();
+                auto const & skeleton = solution.states();
                 // This is just being *ultra* cautious; this double checks that the memory layout is contiguous.
                 const double * const p = skeleton[0].data();
                 for (size_t i = 0; i < skeleton.size(); ++i) {

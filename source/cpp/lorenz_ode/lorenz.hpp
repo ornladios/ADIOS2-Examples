@@ -105,11 +105,38 @@ public:
             auto const & state = states_.back();
             return {state[1], state[2], state[3]};
         }
-        Real nan = std::numeric_limits<Real>::quiet_NaN();
-        return {nan, nan, nan};
+        auto comparator = [&](const Real t, std::array<Real, 7> const & state) {
+            return t < state[0];
+        };
+        auto it = std::upper_bound(states_.begin(), states_.end(), t, comparator);
+        auto i = std::distance(states_.begin(), it) - 1;
+        auto const & s0 = states_[i];
+        auto const & s1 = states_[i+1];
+        Real t0 = s0[0];
+        Real x0 = s0[1];
+        Real y0 = s0[2];
+        Real z0 = s0[3];
+        Real dx0dt = s0[4];
+        Real dy0dt = s0[5];
+        Real dz0dt = s0[6];
+
+        Real t1 = s1[0];
+        Real x1 = s1[1];
+        Real y1 = s1[2];
+        Real z1 = s1[3];
+        Real dxdt1 = s1[4];
+        Real dydt1 = s1[5];
+        Real dzdt1 = s1[6];
+        // Map t into [0,1]:
+        Real dt = s1[0]-s0[0];
+        Real s = (t-t0)/dt;
+        Real x = (1-s)*(1-s)*(x0*(1+2*s)+ dx0dt*(t-t0)) + s*s*(x1*(3-2*s) + dt*dxdt1*(s-1));
+        Real y = (1-s)*(1-s)*(y0*(1+2*s)+ dy0dt*(t-t0)) + s*s*(y1*(3-2*s) + dt*dydt1*(s-1));
+        Real z = (1-s)*(1-s)*(z0*(1+2*s)+ dz0dt*(t-t0)) + s*s*(z1*(3-2*s) + dt*dzdt1*(s-1));
+        return {x, y, z};
     }
 
-    const std::vector<std::array<Real, 7>>& state() const {
+    const std::vector<std::array<Real, 7>>& states() const {
         return states_;
     }
 
@@ -147,7 +174,7 @@ void test_lorenz()
     Real absolute_error = 1e-5;
     const std::array<Real, 3> initial_conditions{0, 0, Real(1)};
     auto solution = lorenz<double>(sigma, beta, rho, initial_conditions, tmax, absolute_error);
-    auto const & skeleton = solution.state();
+    auto const & skeleton = solution.states();
 
     for (auto const & s : skeleton) {
         Real t = s[0];
