@@ -40,7 +40,7 @@ public:
         Real ddotx = sigma*(doty - dotx);
         Real ddoty = dotx*(rho - z) - x*dotz - doty;
         Real ddotz = dotx*y + x*doty - beta*dotz;
-        state_.emplace_back(std::array<Real, 7>{t, x, y, z, dotx, doty, dotz});
+        states_.emplace_back(std::array<Real, 7>{t, x, y, z, dotx, doty, dotz});
         while (t < tmax)
         {
             // ∆t must satisfy three constraints:
@@ -73,31 +73,70 @@ public:
             ddotz = dotx*y + x*doty - beta*dotz;
 
             // And store the state:
-            state_.emplace_back(std::array<Real, 7>{t, x, y, z, dotx, doty, dotz});
+            states_.emplace_back(std::array<Real, 7>{t, x, y, z, dotx, doty, dotz});
         }
     }
 
     // Load data:
-    lorenz(std::vector<std::array<Real, 7>> && state) : state_{std::move(state)}
-    {};
+    lorenz(std::vector<std::array<Real, 7>> && state) : states_{std::move(state)}
+    {
+        // Simple validation: The times increase:
+        Real t = states_[0][0];
+        // t0 = 0: This is just an incidental feature of the solution,
+        // obviously we could change this so that t0 could be arbitrary.
+        // But for now, t0 is not arbitrary, so let's use this to validate the deserialization:
+        if (t != 0) {
+            throw std::logic_error("t0 != 0");
+        }
+        for (size_t i = 1; i < states_.size(); ++i) {
+            Real ti = states_[i][0];
+            if (ti <= t) {
+                throw std::logic_error("Deserialization is incorrect: Times are not sorted in increasing order t_0 < t_1 < ...");
+            }
+            t = ti;
+        }
+    }
 
     std::array<Real, 3> operator()(Real t) const {
+        if (t > tmax() || t < tmin()) {
+            throw std::domain_error("t is not in domain of interpolation.");
+        }
+        if (t == tmax()) {
+            auto const & state = states_.back();
+            return {state[1], state[2], state[3]};
+        }
         Real nan = std::numeric_limits<Real>::quiet_NaN();
         return {nan, nan, nan};
     }
 
     const std::vector<std::array<Real, 7>>& state() const {
-        return state_;
+        return states_;
     }
 
+    Real tmax() const {
+        return states_.back()[0];
+    }
+
+    Real tmin() const {
+        return states_.front()[0];
+    }
+
+    friend std::ostream& operator<<(std::ostream& out, lorenz const & l) {
+        for (auto & state : l.states_) {
+            Real t = state[0];
+            out << "u(" << t << ") = {" << state[1] << ", " << state[2] << ", " << state[3] << "}\n";
+        }
+        return out;
+    }
 
 private:
-    std::vector<std::array<Real, 7>> state_;
+    std::vector<std::array<Real, 7>> states_;
 };
 
 template<typename Real>
 void test_lorenz()
 {
+    using std::abs;
     // Kinda ridiculous to run tests this way,
     // but I don't want to introduce a dependency on a unit test framework into this repo.
     // Test 1: If x(0) = y(0) = 0, then x(t) = y(t) = 0 and z(t) = z(0)exp(-βt).

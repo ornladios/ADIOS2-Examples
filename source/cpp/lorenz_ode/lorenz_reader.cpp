@@ -5,14 +5,29 @@
 #include <adios2.h>
 #include "lorenz.hpp"
 
+#ifdef __has_include
+#  if __has_include(<filesystem>)
+#    include <filesystem>
+   using std::filesystem::exists;
+#  else
+// This (nonfunctional) code only results in a less informative error message:
+bool exists(std::string const & s) { return true; }
+#  endif
+#endif
+
 void read_solution()
 {
     using Real = double;
     adios2::ADIOS adios;
     adios2::IO io = adios.DeclareIO("myio");
+    if (!exists("lorenz.bp"))
+    {
+        std::cerr << "lorenz.bp doesn't exist; have you run ./bin/lorenz_writer?\n";
+        return;
+    }
     adios2::Engine adios_engine = io.Open("lorenz.bp", adios2::Mode::Read);
     auto sigma_att = io.InquireAttribute<Real>("σ");
-    std::cout << "Simulation performed with ";
+    std::cout << "Lorenz system solved with ";
     if (sigma_att) {
         Real sigma = sigma_att.Data()[0];
         std::cout << "σ = " << sigma << ", ";
@@ -38,15 +53,13 @@ void read_solution()
 
     auto absolute_error_att = io.InquireAttribute<Real>("‖û-u‖");
     if (absolute_error_att) {
-        std::cout << "Solutions were computed with an absolute error goal of " << absolute_error_att.Data()[0] << "\n";
+        std::cout << "Solutions were computed with an absolute error goal of " << absolute_error_att.Data()[0] << ".\n";
     }
 
     // Check that std::vector<std::array<Real, 7>> has the proper memory layout.
     static_assert(sizeof(std::array<Real, 7>)==7*sizeof(Real),
                   "The std::array on your system does not have the proper layout to be correctly deserialized in ADIOS2.");
 
-
-    std::vector<std::array<Real, 7>> v;
     auto const & m = io.AvailableVariables();
     for (auto const & [key, val] : io.AvailableVariables())
     {
@@ -65,18 +78,15 @@ void read_solution()
             continue;
         }
         size_t states = shape[0]/7;
-        v.resize(states);
+        std::vector<std::array<Real, 7>> v(states);
+        adios_engine.Get(key, v[0].data(), adios2::Mode::Sync);
 
-        double* d = v[0].data();
-        adios_engine.Get(key, d, adios2::Mode::Sync);
-        std::vector<Real> times(v.size());
-        for (size_t i = 0; i < v.size(); ++i) {
-            times[i] = v[i][0];
-        }
-        // One property of the data:
-        if (!std::is_sorted(times.begin(), times.end())) {
-            std::cerr << "Times should be sorted in increasing order t0 < t1 < ... < tn\n";
-        }
+        auto solution = lorenz(std::move(v));
+        std::array<Real, 3> u = solution(solution.tmax());
+        std::cout << "Last position is u(" << solution.tmax() << ") = {" << u[0] << ", " << u[1] << ", " << u[2] << "}\n";
+        // For more information than we want:
+        // std::cout << solution << "\n";
+
     }
     adios_engine.Close();
 }
