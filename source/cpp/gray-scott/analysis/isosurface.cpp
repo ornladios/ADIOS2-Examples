@@ -210,7 +210,7 @@ int main(int argc, char *argv[])
         isovalues.push_back(std::stod(argv[i]));
     }
 
-    adios2::ADIOS adios("adios2.xml", comm, adios2::DebugON);
+    adios2::ADIOS adios("adios2.xml", comm);
 
     adios2::IO inIO = adios.DeclareIO("SimulationOutput");
     adios2::Engine reader = inIO.Open(input_fname, adios2::Mode::Read);
