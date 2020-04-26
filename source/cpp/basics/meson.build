@@ -3,7 +3,7 @@
 # accompanying file Copyright.txt for details.
 #------------------------------------------------------------------------------#
 
-names = ['variables-shapes', 'variables-shapes-hl']
+names = ['variables-shapes', 'variables-shapes-hl', 'thread-write']
 
 # meson is not Turing-complete, so user-defined functions are not possible
 # still this is a great workaround
