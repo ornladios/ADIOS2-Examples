@@ -16,3 +16,10 @@ add_test(NAME variables-shapes-hl-cpp
          COMMAND mpirun -np ${NPROCS} $<TARGET_FILE:adios2-variables-shapes-hl-cpp>)
 install(TARGETS adios2-variables-shapes-hl-cpp 
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+       
+add_executable(adios2-thread-write-cpp thread-write.cpp)
+target_link_libraries(adios2-thread-write-cpp adios2::adios2 MPI::MPI_C)
+add_test(NAME thread-write-cpp 
+         COMMAND mpirun -np ${NPROCS} $<TARGET_FILE:adios2-thread-write-cpp>)
+install(TARGETS adios2-thread-write-cpp 
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})

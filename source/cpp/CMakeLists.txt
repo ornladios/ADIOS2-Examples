@@ -7,4 +7,5 @@ add_subdirectory(basics)
 add_subdirectory(gray-scott)
 add_subdirectory(hello-world)
 add_subdirectory(korteweg-de-vries)
+# Issues when running on Mac with exists
 add_subdirectory(lorenz_ode)
