@@ -1,14 +1,10 @@
 #!/usr/bin/env python3
-from __future__ import absolute_import, division, print_function, unicode_literals
 import adios2
 import argparse
-from mpi4py import MPI
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 import decomp
-import time
-import os
 
 
 def SetupArgs():
@@ -30,7 +26,7 @@ def SetupArgs():
     args.nz = int(args.nz)
 
     if args.plane not in ('xz', 'yz', 'xy', 'all'):
-        raise "Input argument --plane must be one of xz/yz/xy/all"
+        raise ValueError("Input argument --plane must be one of xz/yz/xy/all")
 
     return args
 
