@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-import adios2
+import adios2                               # pylint: disable=import-error
 import argparse
-import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.gridspec as gridspec
-import decomp
+import numpy as np                          # pylint: disable=import-error
+import matplotlib.pyplot as plt             # pylint: disable=import-error
+import matplotlib.gridspec as gridspec      # pylint: disable=import-error
+import decomp                               # pylint: disable=import-error
 
 
 
