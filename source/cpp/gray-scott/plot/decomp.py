@@ -1,4 +1,4 @@
-import numpy as np
+import numpy as np          # pylint: disable=import-error
 
 
 def Locate(rank, nproc, datasize):
@@ -28,7 +28,7 @@ class MPISetup(object):
 
         if not args.nompi:
 
-            from mpi4py import MPI
+            from mpi4py import MPI    # pylint: disable=import-error
 
             self.comm_app = MPI.COMM_WORLD.Split(appID, MPI.COMM_WORLD.Get_rank()) 
             self.size = self.comm_app.Get_size()

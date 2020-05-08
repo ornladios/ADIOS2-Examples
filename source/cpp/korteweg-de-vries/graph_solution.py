@@ -2,9 +2,9 @@
 import os
 import time
 import argparse
-import numpy
-import adios2
-import diagram
+import numpy            # pylint: disable=import-error
+import adios2           # pylint: disable=import-error
+import diagram          # pylint: disable=import-error
 
 def run():
     parser = argparse.ArgumentParser(description=('Graph KdV equation'))
