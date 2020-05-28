@@ -21,8 +21,9 @@ if(POLICY CMP0074)
 endif()
 
 # Dependencies
-find_package(ADIOS2 REQUIRED 2.5.0)
+find_package(ADIOS2 2.5.0 REQUIRED)
 find_package(MPI)
+find_package(Threads)
 
 # Workaround for various MPI implementations forcing the link of C++ bindings
 add_definitions(-DOMPI_SKIP_MPICXX -DMPICH_SKIP_MPICXX)
