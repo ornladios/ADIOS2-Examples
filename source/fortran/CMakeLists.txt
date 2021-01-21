@@ -3,6 +3,5 @@
 # accompanying file Copyright.txt for details.
 #------------------------------------------------------------------------------#
 
-add_subdirectory(cpp)
-add_subdirectory(c)
-add_subdirectory(fortran)
+#add_subdirectory(adios-module)
+#add_subdirectory(shapes)

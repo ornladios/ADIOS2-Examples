@@ -39,4 +39,10 @@ set(CMAKE_BUILD_TYPE Release)
 enable_testing()
 set(NPROCS 2)
 
+include(CheckLanguage)
+check_language(Fortran)
+if(CMAKE_Fortran_COMPILER)
+    enable_language(Fortran)
+endif()
+
 add_subdirectory(source)
