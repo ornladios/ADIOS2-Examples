@@ -14,14 +14,14 @@ if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_CURRENT_BINARY_DIR)
     "separate from the source directory")
 endif()
 
-project(ADIOS2Examples VERSION 2.5.0)
+project(ADIOS2Examples VERSION 2.7.0)
 # to enable -DADIOS2_ROOT in modern cmake
 if(POLICY CMP0074)
   cmake_policy(SET CMP0074 NEW)
 endif()
 
 # Dependencies
-find_package(ADIOS2 2.5.0 REQUIRED)
+find_package(ADIOS2 2.7.0 REQUIRED)
 find_package(MPI)
 find_package(Threads)
 
