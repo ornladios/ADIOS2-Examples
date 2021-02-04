@@ -14,7 +14,7 @@ pr:
 resources:
   containers:
   - container: u18
-    image: williamfgc/adios2-2.5.0-py3:ubuntu18.04
+    image: williamfgc/adios2-2.7.0-py3:ubuntu18.04
 
 jobs:
 - job: RunInContainer

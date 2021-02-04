@@ -18,7 +18,7 @@ jobs:
     vmImage: 'ubuntu-18.04'
 
   variables:
-    imageName: 'williamfgc/adios2-2.5.0-py3'
+    imageName: 'williamfgc/adios2-2.7.0-py3'
 
   steps:
     - task: Docker@2
