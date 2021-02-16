@@ -3,5 +3,7 @@
 # accompanying file Copyright.txt for details.
 #------------------------------------------------------------------------------#
 
-#add_subdirectory(adios-module)
-#add_subdirectory(shapes)
+if(MPI_FOUND)
+  add_subdirectory(adios-module)
+  add_subdirectory(shapes)
+endif()

@@ -7,5 +7,5 @@ add_subdirectory(c)
 add_subdirectory(cpp)
 
 if(CMAKE_Fortran_COMPILER_LOADED)
-#  add_subdirectory(fortran)
+  add_subdirectory(fortran)
 endif()
