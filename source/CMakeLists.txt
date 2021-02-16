@@ -3,7 +3,7 @@
 # accompanying file Copyright.txt for details.
 #------------------------------------------------------------------------------#
 
-#add_subdirectory(c)
+add_subdirectory(c)
 add_subdirectory(cpp)
 
 if(CMAKE_Fortran_COMPILER_LOADED)
