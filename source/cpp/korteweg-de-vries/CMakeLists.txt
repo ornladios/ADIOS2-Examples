@@ -4,4 +4,4 @@
 #------------------------------------------------------------------------------#
 
 add_executable(KdV KdV.cpp)
-target_link_libraries(KdV adios2::adios2 MPI::MPI_C)
+target_link_libraries(KdV ${common_deps})

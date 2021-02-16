@@ -19,7 +19,7 @@
 #include <adios2.h>
 #if ADIOS2_USE_MPI
 #include <mpi.h>
-#endif()
+#endif
 
 void writer(adios2::ADIOS &adios, const std::size_t nx,
             const std::size_t nsteps, const int rank, const int size)
@@ -233,21 +233,21 @@ void reader(adios2::ADIOS &adios, const int rank, const int size)
 
 int main(int argc, char *argv[])
 {
-#ifdef ADIOS2_USE_MPI
+#if ADIOS2_USE_MPI
     MPI_Init(&argc, &argv);
 #endif
 
     int rank = 0;
     int size = 1;
 
-#ifdef ADIOS2_USE_MPI
+#if ADIOS2_USE_MPI
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
 #endif
 
     try
     {
-#ifdef ADIOS2_USE_MPI
+#if ADIOS2_USE_MPI
         adios2::ADIOS adios(MPI_COMM_WORLD);
 #else
         adios2::ADIOS adios;
@@ -262,12 +262,12 @@ int main(int argc, char *argv[])
     catch (const std::exception &e)
     {
         std::cout << "ERROR: ADIOS2 exception: " << e.what() << "\n";
-#ifdef ADIOS2_USE_MPI
+#if ADIOS2_USE_MPI
         MPI_Abort(MPI_COMM_WORLD, -1);
 #endif
     }
 
-#ifdef ADIOS2_USE_MPI
+#if ADIOS2_USE_MPI
     MPI_Finalize();
 #endif
 

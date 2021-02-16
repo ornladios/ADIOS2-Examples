@@ -16,7 +16,9 @@
 #include <stdexcept> //std::exception
 
 #include <adios2.h>
+#if ADIOS2_USE_MPI
 #include <mpi.h>
+#endif
 
 void writer(const std::size_t nx, const std::size_t nsteps, const int rank,
             const int size)
@@ -49,7 +51,7 @@ void writer(const std::size_t nx, const std::size_t nsteps, const int rank,
     // helps remember the inputs to adios2 functions DefineVariable (write) and
     // SetSelection (read) make sure you always pass std::size_t types
 
-#ifdef ADIOS2_HAVE_MPI
+#if ADIOS2_USE_MPI
     adios2::fstream out("variables-shapes_hl.bp", adios2::fstream::out,
                         MPI_COMM_WORLD);
 #else
@@ -104,7 +106,7 @@ void reader(const int rank, const int size)
     };
 
 // all ranks opening the bp file have access to the entire metadata
-#ifdef ADIOS2_HAVE_MPI
+#if ADIOS2_USE_MPI
     adios2::fstream in("variables-shapes_hl.bp", adios2::fstream::in,
                        MPI_COMM_WORLD);
 #else
@@ -165,13 +167,13 @@ void reader(const int rank, const int size)
 
 int main(int argc, char *argv[])
 {
-#ifdef ADIOS2_HAVE_MPI
+#if ADIOS2_USE_MPI
     MPI_Init(&argc, &argv);
 #endif
     int rank = 0;
     int size = 1;
 
-#ifdef ADIOS2_HAVE_MPI
+#if ADIOS2_USE_MPI
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
 #endif
@@ -187,12 +189,12 @@ int main(int argc, char *argv[])
     catch (std::exception &e)
     {
         std::cout << "ERROR: ADIOS2 exception: " << e.what() << "\n";
-#ifdef ADIOS2_HAVE_MPI
+#if ADIOS2_USE_MPI
         MPI_Abort(MPI_COMM_WORLD, -1);
 #endif
     }
 
-#ifdef ADIOS2_HAVE_MPI
+#if ADIOS2_USE_MPI
     MPI_Finalize();
 #endif
 
