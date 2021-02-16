@@ -13,12 +13,15 @@
 #include <stdexcept>
 
 #include <adios2.h>
+#if ADIOS2_USE_MPI
 #include <mpi.h>
+#endif
 
 void writer(const std::string &greeting)
 {
-#ifdef ADIOS2_HAVE_MPI
-    adios2::fstream out("hello-world-hl-cpp.bp", adios2::fstream::out, MPI_COMM_WORLD);
+#if ADIOS2_USE_MPI
+    adios2::fstream out("hello-world-hl-cpp.bp", adios2::fstream::out,
+                        MPI_COMM_WORLD);
 #else
     adios2::fstream out("hello-world-hl-cpp.bp", adios2::fstream::out);
 #endif
@@ -29,8 +32,9 @@ void writer(const std::string &greeting)
 
 std::string reader()
 {
-#ifdef ADIOS2_HAVE_MPI
-    adios2::fstream in("hello-world-hl-cpp.bp", adios2::fstream::in, MPI_COMM_WORLD);
+#if ADIOS2_USE_MPI
+    adios2::fstream in("hello-world-hl-cpp.bp", adios2::fstream::in,
+                       MPI_COMM_WORLD);
 #else
     adios2::fstream in("hello-world-hl-cpp.bp", adios2::fstream::in);
 #endif
@@ -41,7 +45,7 @@ std::string reader()
 
 int main(int argc, char *argv[])
 {
-#ifdef ADIOS2_HAVE_MPI
+#if ADIOS2_USE_MPI
     MPI_Init(&argc, &argv);
 #endif
 
@@ -56,12 +60,12 @@ int main(int argc, char *argv[])
     catch (std::exception &e)
     {
         std::cout << "ERROR: ADIOS2 exception: " << e.what() << "\n";
-#ifdef ADIOS2_HAVE_MPI
+#if ADIOS2_USE_MPI
         MPI_Abort(MPI_COMM_WORLD, -1);
 #endif
     }
 
-#ifdef ADIOS2_HAVE_MPI
+#if ADIOS2_USE_MPI
     MPI_Finalize();
 #endif
 

@@ -35,12 +35,14 @@ vtkSmartPointer<vtkPolyData> read_mesh(const std::vector<double> &bufPoints,
 
     auto points = vtkSmartPointer<vtkPoints>::New();
     points->SetNumberOfPoints(nPoints);
-    for (vtkIdType i = 0; i < nPoints; i++) {
+    for (vtkIdType i = 0; i < nPoints; i++)
+    {
         points->SetPoint(i, &bufPoints[i * 3]);
     }
 
     auto polys = vtkSmartPointer<vtkCellArray>::New();
-    for (vtkIdType i = 0; i < nCells; i++) {
+    for (vtkIdType i = 0; i < nCells; i++)
+    {
         vtkIdType a = bufCells[i * 3 + 0];
         vtkIdType b = bufCells[i * 3 + 1];
         vtkIdType c = bufCells[i * 3 + 2];
@@ -53,7 +55,8 @@ vtkSmartPointer<vtkPolyData> read_mesh(const std::vector<double> &bufPoints,
 
     auto normals = vtkSmartPointer<vtkDoubleArray>::New();
     normals->SetNumberOfComponents(3);
-    for (vtkIdType i = 0; i < nPoints; i++) {
+    for (vtkIdType i = 0; i < nPoints; i++)
+    {
         normals->InsertNextTuple(&bufNormals[i * 3]);
     }
 
@@ -85,7 +88,8 @@ void find_blobs(const vtkSmartPointer<vtkPolyData> polyData)
     surfaceFilter->SetInputConnection(threshold->GetOutputPort());
     massProperties->SetInputConnection(surfaceFilter->GetOutputPort());
 
-    for (int i = 0; i < nBlobs; i++) {
+    for (int i = 0; i < nBlobs; i++)
+    {
         threshold->ThresholdBetween(i, i);
 
         std::cout << "Surface area of blob #" << i << " is "
@@ -125,16 +129,20 @@ int main(int argc, char *argv[])
     MPI_Comm_rank(comm, &rank);
     MPI_Comm_size(comm, &procs);
 
-    if (argc < 2) {
-        if (rank == 0) {
+    if (argc < 2)
+    {
+        if (rank == 0)
+        {
             std::cerr << "Too few arguments" << std::endl;
             std::cout << "Usage: find_blobs input" << std::endl;
         }
         MPI_Abort(MPI_COMM_WORLD, -1);
     }
 
-    if (procs != 1) {
-        if (rank == 0) {
+    if (procs != 1)
+    {
+        if (rank == 0)
+        {
             std::cerr << "find_blobs only supports serial execution"
                       << std::endl;
         }
@@ -165,7 +173,8 @@ int main(int argc, char *argv[])
     log << "step\ttotal_blobs\tread_blobs\tcompute_blobs" << std::endl;
 #endif
 
-    while (true) {
+    while (true)
+    {
 #ifdef ENABLE_TIMERS
         MPI_Barrier(comm);
         timer_total.start();
@@ -174,7 +183,8 @@ int main(int argc, char *argv[])
 
         adios2::StepStatus status = reader.BeginStep();
 
-        if (status != adios2::StepStatus::OK) {
+        if (status != adios2::StepStatus::OK)
+        {
             break;
         }
 
@@ -183,7 +193,8 @@ int main(int argc, char *argv[])
         auto varNormal = inIO.InquireVariable<double>("normal");
         auto varStep = inIO.InquireVariable<int>("step");
 
-        if (varPoint.Shape().size() > 0 || varCell.Shape().size() > 0) {
+        if (varPoint.Shape().size() > 0 || varCell.Shape().size() > 0)
+        {
             varPoint.SetSelection(
                 {{0, 0}, {varPoint.Shape()[0], varPoint.Shape()[1]}});
             varCell.SetSelection(

@@ -18,8 +18,7 @@ private:
 
 public:
     Timer()
-        : _is_running(false),
-          _total(std::chrono::steady_clock::duration::zero())
+    : _is_running(false), _total(std::chrono::steady_clock::duration::zero())
     {
     }
 

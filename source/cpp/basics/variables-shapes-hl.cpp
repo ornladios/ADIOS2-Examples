@@ -16,9 +16,12 @@
 #include <stdexcept> //std::exception
 
 #include <adios2.h>
+#if ADIOS2_USE_MPI
 #include <mpi.h>
+#endif
 
-void writer(const std::size_t nx, const std::size_t nsteps, const int rank, const int size)
+void writer(const std::size_t nx, const std::size_t nsteps, const int rank,
+            const int size)
 {
     auto lf_compute = [](const std::size_t step, const std::size_t nx,
                          const int rank) -> std::vector<float> {
@@ -36,18 +39,21 @@ void writer(const std::size_t nx, const std::size_t nsteps, const int rank, cons
     // global shape -> this is the physical dimension across MPI processes
     const adios2::Dims shape = {static_cast<std::size_t>(size * nx)};
 
-    // local start for rank offset -> this is the local origin for the rank domain
+    // local start for rank offset -> this is the local origin for the rank
+    // domain
     const adios2::Dims start = {static_cast<std::size_t>(rank * nx)};
 
-    // local count -> this is the local size from the local start for the rank domain
+    // local count -> this is the local size from the local start for the rank
+    // domain
     const adios2::Dims count = {nx};
 
     // adios2::Dims is an alias to std::vector<std::size_t>
-    // helps remember the inputs to adios2 functions DefineVariable (write) and SetSelection (read)
-    // make sure you always pass std::size_t types
+    // helps remember the inputs to adios2 functions DefineVariable (write) and
+    // SetSelection (read) make sure you always pass std::size_t types
 
-#ifdef ADIOS2_HAVE_MPI
-    adios2::fstream out("variables-shapes_hl.bp", adios2::fstream::out, MPI_COMM_WORLD);
+#if ADIOS2_USE_MPI
+    adios2::fstream out("variables-shapes_hl.bp", adios2::fstream::out,
+                        MPI_COMM_WORLD);
 #else
     adios2::fstream out("variables-shapes_hl.bp", adios2::fstream::out);
 #endif
@@ -59,7 +65,8 @@ void writer(const std::size_t nx, const std::size_t nsteps, const int rank, cons
 
         // ADIOS2 I/O portion
 
-        // minimize global and local values footprint, by only one rank writing the variables
+        // minimize global and local values footprint, by only one rank writing
+        // the variables
         if (rank == 0)
         {
             // Global value changing over steps
@@ -68,10 +75,12 @@ void writer(const std::size_t nx, const std::size_t nsteps, const int rank, cons
             if (step == 0)
             {
                 // Constant Global value
-                out.write("GlobalValueString", std::string("ADIOS2 Basics Variable Example"));
+                out.write("GlobalValueString",
+                          std::string("ADIOS2 Basics Variable Example"));
 
                 // Constant Local value
-                out.write("LocalValueInt32", static_cast<int32_t>(rank), adios2::LocalValue);
+                out.write("LocalValueInt32", static_cast<int32_t>(rank),
+                          adios2::LocalValue);
             }
         }
 
@@ -97,8 +106,9 @@ void reader(const int rank, const int size)
     };
 
 // all ranks opening the bp file have access to the entire metadata
-#ifdef ADIOS2_HAVE_MPI
-    adios2::fstream in("variables-shapes_hl.bp", adios2::fstream::in, MPI_COMM_WORLD);
+#if ADIOS2_USE_MPI
+    adios2::fstream in("variables-shapes_hl.bp", adios2::fstream::in,
+                       MPI_COMM_WORLD);
 #else
     adios2::fstream in("variables-shapes_hl.bp", adios2::fstream::in);
 #endif
@@ -113,8 +123,8 @@ void reader(const int rank, const int size)
         const std::vector<uint64_t> steps = inStep.read<uint64_t>("Step");
         if (!steps.empty() && rank == 0)
         {
-            std::cout << "Found Step " << steps.front() << " in currentStep " << currentStep
-                      << "\n";
+            std::cout << "Found Step " << steps.front() << " in currentStep "
+                      << currentStep << "\n";
         }
 
         const std::vector<std::string> globalValueString =
@@ -128,14 +138,16 @@ void reader(const int rank, const int size)
         const std::vector<int32_t> ranks = inStep.read<int32_t>("Ranks");
         if (!ranks.empty() && rank == 0)
         {
-            std::cout << "Found rank " << ranks.front() << " in currentStep " << currentStep
-                      << "\n";
+            std::cout << "Found rank " << ranks.front() << " in currentStep "
+                      << currentStep << "\n";
         }
 
-        const std::vector<float> globalArray = inStep.read<float>("GlobalArray");
+        const std::vector<float> globalArray =
+            inStep.read<float>("GlobalArray");
         if (!globalArray.empty() && rank == 0)
         {
-            std::cout << "Found globalArray " << lf_ArrayToString(globalArray) + " in currentStep "
+            std::cout << "Found globalArray "
+                      << lf_ArrayToString(globalArray) + " in currentStep "
                       << currentStep << "\n";
         }
 
@@ -143,7 +155,8 @@ void reader(const int rank, const int size)
         const std::vector<float> localArray = inStep.read<float>("LocalArray");
         if (!localArray.empty() && rank == 0)
         {
-            std::cout << "Found localArray " << lf_ArrayToString(localArray) + " in currentStep "
+            std::cout << "Found localArray "
+                      << lf_ArrayToString(localArray) + " in currentStep "
                       << currentStep << "\n";
         }
         // indicate end of adios2 operations for this step
@@ -154,13 +167,13 @@ void reader(const int rank, const int size)
 
 int main(int argc, char *argv[])
 {
-#ifdef ADIOS2_HAVE_MPI
+#if ADIOS2_USE_MPI
     MPI_Init(&argc, &argv);
 #endif
     int rank = 0;
     int size = 1;
 
-#ifdef ADIOS2_HAVE_MPI
+#if ADIOS2_USE_MPI
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
 #endif
@@ -176,12 +189,12 @@ int main(int argc, char *argv[])
     catch (std::exception &e)
     {
         std::cout << "ERROR: ADIOS2 exception: " << e.what() << "\n";
-#ifdef ADIOS2_HAVE_MPI
+#if ADIOS2_USE_MPI
         MPI_Abort(MPI_COMM_WORLD, -1);
 #endif
     }
 
-#ifdef ADIOS2_HAVE_MPI
+#if ADIOS2_USE_MPI
     MPI_Finalize();
 #endif
 

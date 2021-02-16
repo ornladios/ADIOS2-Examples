@@ -1,0 +1,38 @@
+# Set the ADIOS2 installation directory
+ADIOS2_DIR=/opt/adios2
+
+# Set the MPI compilers if available
+MPICC=mpicc
+MPICXX=mpicxx
+MPIFC=mpif90
+
+# Set the serial compilers
+CC=gcc
+CXX=g++
+FC=gfortran
+
+######################################################
+#  These settings below should not need to be edited #
+######################################################
+
+CXX_MPI_FLAGS=`${ADIOS2_DIR}/bin/adios2-config --cxx-flags -m`
+CXX_MPI_LDFLAGS=`${ADIOS2_DIR}/bin/adios2-config --cxx-libs -m`
+
+CXX_FLAGS=`adios2-config --cxx-flags -s`
+CXX_LDFLAGS=`adios2-config --cxx-libs -s`
+
+C_MPI_FLAGS=`${ADIOS2_DIR}/bin/adios2-config --c-flags -m`
+C_MPI_LDFLAGS=`${ADIOS2_DIR}/bin/adios2-config --c-libs -m`
+
+C_FLAGS=`${ADIOS2_DIR}/bin/adios2-config --c-flags -s`
+C_LDFLAGS=`${ADIOS2_DIR}/bin/adios2-config --c-libs -s`
+
+F90_MPI_FLAGS=`${ADIOS2_DIR}/bin/adios2-config --fortran-flags -m`
+F90_MPI_LDFLAGS=`${ADIOS2_DIR}/bin/adios2-config --fortran-libs -m`
+
+F90_FLAGS=`${ADIOS2_DIR}/bin/adios2-config --fortran-flags -s`
+F90_LDFLAGS=`${ADIOS2_DIR}/bin/adios2-config --fortran-libs -s`
+
+
+ 
+
