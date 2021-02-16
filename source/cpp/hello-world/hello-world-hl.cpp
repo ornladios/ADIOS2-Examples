@@ -20,7 +20,8 @@
 void writer(const std::string &greeting)
 {
 #if ADIOS2_USE_MPI
-    adios2::fstream out("hello-world-hl-cpp.bp", adios2::fstream::out, MPI_COMM_WORLD);
+    adios2::fstream out("hello-world-hl-cpp.bp", adios2::fstream::out,
+                        MPI_COMM_WORLD);
 #else
     adios2::fstream out("hello-world-hl-cpp.bp", adios2::fstream::out);
 #endif
@@ -32,7 +33,8 @@ void writer(const std::string &greeting)
 std::string reader()
 {
 #if ADIOS2_USE_MPI
-    adios2::fstream in("hello-world-hl-cpp.bp", adios2::fstream::in, MPI_COMM_WORLD);
+    adios2::fstream in("hello-world-hl-cpp.bp", adios2::fstream::in,
+                       MPI_COMM_WORLD);
 #else
     adios2::fstream in("hello-world-hl-cpp.bp", adios2::fstream::in);
 #endif

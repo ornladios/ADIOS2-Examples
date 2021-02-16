@@ -4,13 +4,14 @@
  * accompanying file Copyright.txt for details.
  *
  * thread-write.cpp : adios2 low-level API example to write in a threaded
- *                    application using C++11 thread and having adios2 calls inside mutex regions
- *                    adios2 API are not thread-safe:
- *                    1. launching MPI from a thread is not possible on many supercomputers
- *                    2. I/O is highly serialized (buffering and low-level I/O calls),
- *                       therefore users must be aware that adios2 might introduce bottlenecks.
- *                    To run:
- *                    Do not use MPI, just run the executable ./adios2-thread-write
+ *                    application using C++11 thread and having adios2 calls
+ * inside mutex regions adios2 API are not thread-safe:
+ *                    1. launching MPI from a thread is not possible on many
+ * supercomputers
+ *                    2. I/O is highly serialized (buffering and low-level I/O
+ * calls), therefore users must be aware that adios2 might introduce
+ * bottlenecks. To run: Do not use MPI, just run the executable
+ * ./adios2-thread-write
  *
  *  Created on: Nov 14, 2019
  *      Author: William F Godoy godoywf@ornl.gov
@@ -32,8 +33,9 @@ std::mutex mutex;
 
 // tasks that runs on thread, each section of the vector is covered
 template <class T>
-void ThreadTask(const std::size_t threadID, std::vector<T> &data, const std::size_t startIndex,
-                const std::size_t localSize, const std::string &variableName, adios2::IO io,
+void ThreadTask(const std::size_t threadID, std::vector<T> &data,
+                const std::size_t startIndex, const std::size_t localSize,
+                const std::string &variableName, adios2::IO io,
                 adios2::Engine engine)
 {
     // populate vector data, but simply adding step to index
@@ -72,13 +74,16 @@ int main(int argc, char *argv[])
         // populate shape, leave start and count empty as
         // they will come from each thread SetSelection
         const std::string variableName = "data";
-        io.DefineVariable<double>(variableName, adios2::Dims{nx}, adios2::Dims(), adios2::Dims());
+        io.DefineVariable<double>(variableName, adios2::Dims{nx},
+                                  adios2::Dims(), adios2::Dims());
 
-        adios2::Engine engine = io.Open("thread-writes.bp", adios2::Mode::Write);
+        adios2::Engine engine =
+            io.Open("thread-writes.bp", adios2::Mode::Write);
 
         // set up thread tasks
         // just grab maximum number of threads to simplify things
-        const std::size_t nthreads = static_cast<std::size_t>(std::thread::hardware_concurrency());
+        const std::size_t nthreads =
+            static_cast<std::size_t>(std::thread::hardware_concurrency());
         std::vector<std::thread> threadTasks;
         threadTasks.reserve(nthreads);
 
@@ -98,8 +103,9 @@ int main(int argc, char *argv[])
             // use std::ref to pass things by reference
             // adios2 objects can be passed by value
 
-            threadTasks.push_back(std::thread(ThreadTask<double>, t, std::ref(data), startIndex,
-                                              localSize, std::ref(variableName), io, engine));
+            threadTasks.push_back(
+                std::thread(ThreadTask<double>, t, std::ref(data), startIndex,
+                            localSize, std::ref(variableName), io, engine));
         }
 
         for (auto &threadTask : threadTasks)

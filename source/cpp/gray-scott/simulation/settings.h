@@ -3,7 +3,8 @@
 
 #include <string>
 
-struct Settings {
+struct Settings
+{
     size_t L;
     int steps;
     int plotgap;
