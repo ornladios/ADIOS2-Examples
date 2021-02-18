@@ -1,0 +1,27 @@
+me: Build and Test
+
+on: 
+  push: 
+    branches: 
+    - master 
+  pull_request: 
+    branches: 
+    - master 
+
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    container:
+      image: ornladios/adios2:release-${{ matrix.container }}
+    strategy:
+      fail-fast: false
+      matrix:
+        baseos: [
+          ubuntu18.04,
+          ubuntu20.04 ]
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
+
