@@ -1,4 +1,4 @@
-me: Build and Test
+name: Build and Test
 
 on: 
   push: 
@@ -9,10 +9,11 @@ on:
     - master 
 
 jobs:
-  linux:
+  linux-cmake:
     runs-on: ubuntu-latest
     container:
-      image: ornladios/adios2:release-${{ matrix.container }}
+      image: ornladios/adios2:release-${{ matrix.baseos }}
+
     strategy:
       fail-fast: false
       matrix:
@@ -20,8 +21,42 @@ jobs:
           ubuntu18.04,
           ubuntu20.04 ]
 
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        ref: ${{ github.event.pull_request.head.sha }}
+    defaults:
+      run:
+        shell: bash --login {0}
+        working-directory: /home/adios
 
+    steps:
+    - name: Debug info
+      run: |
+          echo :::::
+          whoami
+          echo :::::
+          pwd
+          echo :::::
+          ls -la $PWD
+          echo :::::
+          env | sort
+          echo :::::
+          cat /etc/profile.d/adios2.sh
+    - name: Checkout
+      run: |
+          mkdir source
+          cd source
+          git init
+          git remote add origin ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}
+          git fetch --depth=1 origin ${GITHUB_SHA}
+          git checkout ${GITHUB_SHA}
+    - name: Configure
+      run: |
+          mkdir -p build
+          cd build
+          cmake ../source
+    - name: Build
+      run: |
+          cd build
+          make -j$(grep -c '^processor' /proc/cpuinfo)
+    - name: Test
+      run: |
+          cd build
+          ctest -VV -j 1
