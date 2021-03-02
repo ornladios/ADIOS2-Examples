@@ -13,12 +13,15 @@
 #include <stdexcept>
 
 #include <adios2.h>
+#if ADIOS2_USE_MPI
 #include <mpi.h>
+#endif
 
 void writer(adios2::ADIOS &adios, const std::string &greeting)
 {
     adios2::IO io = adios.DeclareIO("hello-world-writer");
-    adios2::Variable<std::string> varGreeting = io.DefineVariable<std::string>("Greeting");
+    adios2::Variable<std::string> varGreeting =
+        io.DefineVariable<std::string>("Greeting");
 
     adios2::Engine writer = io.Open("hello-world-cpp.bp", adios2::Mode::Write);
     writer.Put(varGreeting, greeting);
@@ -29,7 +32,8 @@ std::string reader(adios2::ADIOS &adios)
 {
     adios2::IO io = adios.DeclareIO("hello-world-reader");
     adios2::Engine reader = io.Open("hello-world-cpp.bp", adios2::Mode::Read);
-    adios2::Variable<std::string> varGreeting = io.InquireVariable<std::string>("Greeting");
+    adios2::Variable<std::string> varGreeting =
+        io.InquireVariable<std::string>("Greeting");
     std::string greeting;
     reader.Get(varGreeting, greeting);
     reader.Close();
@@ -38,13 +42,13 @@ std::string reader(adios2::ADIOS &adios)
 
 int main(int argc, char *argv[])
 {
-#ifdef ADIOS2_HAVE_MPI
+#if ADIOS2_USE_MPI
     MPI_Init(&argc, &argv);
 #endif
 
     try
     {
-#ifdef ADIOS2_HAVE_MPI
+#if ADIOS2_USE_MPI
         adios2::ADIOS adios(MPI_COMM_WORLD);
 #else
         adios2::ADIOS adios;
@@ -59,12 +63,12 @@ int main(int argc, char *argv[])
     catch (std::exception &e)
     {
         std::cout << "ERROR: ADIOS2 exception: " << e.what() << "\n";
-#ifdef ADIOS2_HAVE_MPI
+#if ADIOS2_USE_MPI
         MPI_Abort(MPI_COMM_WORLD, -1);
 #endif
     }
 
-#ifdef ADIOS2_HAVE_MPI
+#if ADIOS2_USE_MPI
     MPI_Finalize();
 #endif
 

@@ -13,15 +13,19 @@
 #include <stdlib.h> //malloc, free
 
 #include <adios2_c.h>
+#if ADIOS2_USE_MPI
 #include <mpi.h>
+#endif
 
 void writer(adios2_adios *adios, const char *greeting)
 {
     adios2_io *io = adios2_declare_io(adios, "hello-world-writer");
-    adios2_variable *var_greeting = adios2_define_variable(
-        io, "Greeting", adios2_type_string, 0, NULL, NULL, NULL, adios2_constant_dims_true);
+    adios2_variable *var_greeting =
+        adios2_define_variable(io, "Greeting", adios2_type_string, 0, NULL,
+                               NULL, NULL, adios2_constant_dims_true);
 
-    adios2_engine *engine = adios2_open(io, "hello-world-c.bp", adios2_mode_write);
+    adios2_engine *engine =
+        adios2_open(io, "hello-world-c.bp", adios2_mode_write);
     adios2_put(engine, var_greeting, greeting, adios2_mode_deferred);
     adios2_close(engine);
 }
@@ -29,7 +33,8 @@ void writer(adios2_adios *adios, const char *greeting)
 void reader(adios2_adios *adios, char *greeting)
 {
     adios2_io *io = adios2_declare_io(adios, "hello-world-reader");
-    adios2_engine *engine = adios2_open(io, "hello-world-c.bp", adios2_mode_read);
+    adios2_engine *engine =
+        adios2_open(io, "hello-world-c.bp", adios2_mode_read);
     adios2_variable *var_greeting = adios2_inquire_variable(io, "Greeting");
     adios2_get(engine, var_greeting, greeting, adios2_mode_deferred);
     adios2_close(engine);
@@ -37,12 +42,12 @@ void reader(adios2_adios *adios, char *greeting)
 
 int main(int argc, char *argv[])
 {
-#ifdef ADIOS2_HAVE_MPI
+#if ADIOS2_USE_MPI
     MPI_Init(&argc, &argv);
 #endif
 
     {
-#ifdef ADIOS2_HAVE_MPI
+#if ADIOS2_USE_MPI
         adios2_adios *adios = adios2_init(MPI_COMM_WORLD, adios2_debug_mode_on);
 #else
         adios2_adios *adios = adios2_init(adios2_debug_mode_on);
@@ -58,7 +63,7 @@ int main(int argc, char *argv[])
         free(message);
     }
 
-#ifdef ADIOS2_HAVE_MPI
+#if ADIOS2_USE_MPI
     MPI_Finalize();
 #endif
 

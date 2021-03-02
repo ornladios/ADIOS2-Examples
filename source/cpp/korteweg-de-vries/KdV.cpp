@@ -80,7 +80,8 @@ void KdV(int64_t N, Real dt, Real t_max, Real delta = 0.022)
     io.DefineAttribute<Real>("x0", 0);
     io.DefineAttribute<Real>("dx", dx);
     io.DefineAttribute<std::string>("interpretation", "Equispaced");
-    adios2::Engine adios_engine = io.Open("korteweg_de_vries.bp", adios2::Mode::Write);
+    adios2::Engine adios_engine =
+        io.Open("korteweg_de_vries.bp", adios2::Mode::Write);
 
     std::vector<Real> u0(N);
     for (int64_t i = 0; i < N; ++i)
@@ -184,7 +185,7 @@ int main(int argc, char **argv)
     {
         KdV<double>(N, dt, t_max, delta);
     }
-    catch (std::exception const & e)
+    catch (std::exception const &e)
     {
         std::cerr << "Caught exception from KdV call: " << e.what() << "\n";
         return 1;

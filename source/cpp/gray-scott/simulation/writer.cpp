@@ -28,9 +28,12 @@ void define_bpvtk_attribute(const Settings &s, adios2::IO &io)
         io.DefineAttribute<std::string>("vtk.xml", imageData);
     };
 
-    if (s.mesh_type == "image") {
+    if (s.mesh_type == "image")
+    {
         lf_VTKImage(s, io);
-    } else if (s.mesh_type == "structured") {
+    }
+    else if (s.mesh_type == "structured")
+    {
         throw std::invalid_argument(
             "ERROR: mesh_type=structured not yet "
             "   supported in settings.json, use mesh_type=image instead\n");
@@ -39,7 +42,7 @@ void define_bpvtk_attribute(const Settings &s, adios2::IO &io)
 }
 
 Writer::Writer(const Settings &settings, const GrayScott &sim, adios2::IO io)
-    : settings(settings), io(io)
+: settings(settings), io(io)
 {
     io.DefineAttribute<double>("F", settings.F);
     io.DefineAttribute<double>("k", settings.k);
@@ -48,7 +51,8 @@ Writer::Writer(const Settings &settings, const GrayScott &sim, adios2::IO io)
     io.DefineAttribute<double>("Dv", settings.Dv);
     io.DefineAttribute<double>("noise", settings.noise);
     // define VTK visualization schema as an attribute
-    if (!settings.mesh_type.empty()) {
+    if (!settings.mesh_type.empty())
+    {
         define_bpvtk_attribute(settings, io);
     }
 
@@ -62,7 +66,8 @@ Writer::Writer(const Settings &settings, const GrayScott &sim, adios2::IO io)
                                   {sim.offset_z, sim.offset_y, sim.offset_x},
                                   {sim.size_z, sim.size_y, sim.size_x});
 
-    if (settings.adios_memory_selection) {
+    if (settings.adios_memory_selection)
+    {
         var_u.SetMemorySelection(
             {{1, 1, 1}, {sim.size_z + 2, sim.size_y + 2, sim.size_x + 2}});
         var_v.SetMemorySelection(
@@ -79,13 +84,15 @@ void Writer::open(const std::string &fname)
 
 void Writer::write(int step, const GrayScott &sim)
 {
-    if (!sim.size_x || !sim.size_y || !sim.size_z) {
+    if (!sim.size_x || !sim.size_y || !sim.size_z)
+    {
         writer.BeginStep();
         writer.EndStep();
         return;
     }
 
-    if (settings.adios_memory_selection) {
+    if (settings.adios_memory_selection)
+    {
         const std::vector<double> &u = sim.u_ghost();
         const std::vector<double> &v = sim.v_ghost();
 
@@ -94,7 +101,9 @@ void Writer::write(int step, const GrayScott &sim)
         writer.Put<double>(var_u, u.data());
         writer.Put<double>(var_v, v.data());
         writer.EndStep();
-    } else if (settings.adios_span) {
+    }
+    else if (settings.adios_span)
+    {
         writer.BeginStep();
 
         writer.Put<int>(var_step, &step);
@@ -108,7 +117,9 @@ void Writer::write(int step, const GrayScott &sim)
         sim.v_noghost(v_span.data());
 
         writer.EndStep();
-    } else {
+    }
+    else
+    {
         std::vector<double> u = sim.u_noghost();
         std::vector<double> v = sim.v_noghost();
 

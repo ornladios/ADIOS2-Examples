@@ -88,12 +88,18 @@ protected:
     // Check if point is included in my subdomain
     inline bool is_inside(int x, int y, int z) const
     {
-        if (x < offset_x) return false;
-        if (x >= offset_x + size_x) return false;
-        if (y < offset_y) return false;
-        if (y >= offset_y + size_y) return false;
-        if (z < offset_z) return false;
-        if (z >= offset_z + size_z) return false;
+        if (x < offset_x)
+            return false;
+        if (x >= offset_x + size_x)
+            return false;
+        if (y < offset_y)
+            return false;
+        if (y >= offset_y + size_y)
+            return false;
+        if (z < offset_z)
+            return false;
+        if (z >= offset_z + size_z)
+            return false;
 
         return true;
     }

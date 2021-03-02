@@ -84,13 +84,15 @@ void write_adios(adios2::Engine &writer,
     cellArray->InitTraversal();
 
     // Iterate through cells
-    for (int i = 0; i < polyData->GetNumberOfPolys(); i++) {
+    for (int i = 0; i < polyData->GetNumberOfPolys(); i++)
+    {
         auto idList = vtkSmartPointer<vtkIdList>::New();
 
         cellArray->GetNextCell(idList);
 
         // Iterate through points of a cell
-        for (int j = 0; j < idList->GetNumberOfIds(); j++) {
+        for (int j = 0; j < idList->GetNumberOfIds(); j++)
+        {
             auto id = idList->GetId(j);
 
             cells[i * 3 + j] = id;
@@ -106,7 +108,8 @@ void write_adios(adios2::Engine &writer,
     auto normalArray = polyData->GetPointData()->GetNormals();
 
     // Extract normals
-    for (int i = 0; i < normalArray->GetNumberOfTuples(); i++) {
+    for (int i = 0; i < normalArray->GetNumberOfTuples(); i++)
+    {
         normalArray->GetTuple(i, coords);
 
         normals[i * 3 + 0] = coords[0];
@@ -129,7 +132,8 @@ void write_adios(adios2::Engine &writer,
     varNormal.SetShape(varPoint.Shape());
     varNormal.SetSelection({varPoint.Start(), varPoint.Count()});
 
-    if (numPoints) {
+    if (numPoints)
+    {
         writer.Put(varPoint, points.data());
         writer.Put(varNormal, normals.data());
     }
@@ -138,7 +142,8 @@ void write_adios(adios2::Engine &writer,
     MPI_Allreduce(&numCells, &totalCells, 1, MPI_INT, MPI_SUM, comm);
     MPI_Scan(&numCells, &offsetCells, 1, MPI_INT, MPI_SUM, comm);
 
-    for (int i = 0; i < cells.size(); i++) {
+    for (int i = 0; i < cells.size(); i++)
+    {
         cells[i] += (offsetPoints - numPoints);
     }
 
@@ -148,11 +153,13 @@ void write_adios(adios2::Engine &writer,
                           {static_cast<size_t>(numCells),
                            static_cast<size_t>(numCells > 0 ? 3 : 0)}});
 
-    if (numCells) {
+    if (numCells)
+    {
         writer.Put(varCell, cells.data());
     }
 
-    if (!rank) {
+    if (!rank)
+    {
         std::cout << "isosurface at step " << step << " writing out "
                   << totalCells << " cells and " << totalPoints << " points"
                   << std::endl;
@@ -193,8 +200,10 @@ int main(int argc, char *argv[])
     size_t py = coords[1];
     size_t pz = coords[2];
 
-    if (argc < 4) {
-        if (rank == 0) {
+    if (argc < 4)
+    {
+        if (rank == 0)
+        {
             std::cerr << "Too few arguments" << std::endl;
             std::cout << "Usage: isosurface input output isovalues..."
                       << std::endl;
@@ -206,7 +215,8 @@ int main(int argc, char *argv[])
     const std::string output_fname(argv[2]);
 
     std::vector<double> isovalues;
-    for (int i = 3; i < argc; i++) {
+    for (int i = 3; i < argc; i++)
+    {
         isovalues.push_back(std::stod(argv[i]));
     }
 
@@ -241,7 +251,8 @@ int main(int argc, char *argv[])
     log << "step\ttotal_iso\tread_iso\tcompute_iso\twrite_iso" << std::endl;
 #endif
 
-    while (true) {
+    while (true)
+    {
 #ifdef ENABLE_TIMERS
         MPI_Barrier(comm);
         timer_total.start();
@@ -250,7 +261,8 @@ int main(int argc, char *argv[])
 
         adios2::StepStatus status = reader.BeginStep();
 
-        if (status != adios2::StepStatus::OK) {
+        if (status != adios2::StepStatus::OK)
+        {
             break;
         }
 
@@ -267,13 +279,16 @@ int main(int argc, char *argv[])
         size_t offset_y = size_y * py;
         size_t offset_z = size_z * pz;
 
-        if (px == npx - 1) {
+        if (px == npx - 1)
+        {
             size_x -= size_x * npx - shape[0];
         }
-        if (py == npy - 1) {
+        if (py == npy - 1)
+        {
             size_y -= size_y * npy - shape[1];
         }
-        if (pz == npz - 1) {
+        if (pz == npz - 1)
+        {
             size_z -= size_z * npz - shape[2];
         }
 
@@ -294,7 +309,8 @@ int main(int argc, char *argv[])
 
         auto appendFilter = vtkSmartPointer<vtkAppendPolyData>::New();
 
-        for (const auto isovalue : isovalues) {
+        for (const auto isovalue : isovalues)
+        {
             auto polyData = compute_isosurface(varU, u, isovalue);
             appendFilter->AddInputData(polyData);
         }

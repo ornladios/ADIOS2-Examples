@@ -8,10 +8,9 @@
 #include <random>
 #include <vector>
 
-
 GrayScott::GrayScott(const Settings &settings, MPI_Comm comm)
-    : settings(settings), comm(comm), rand_dev(), mt_gen(rand_dev()),
-      uniform_dist(-1.0, 1.0)
+: settings(settings), comm(comm), rand_dev(), mt_gen(rand_dev()),
+  uniform_dist(-1.0, 1.0)
 {
 }
 
@@ -73,10 +72,14 @@ void GrayScott::init_field()
     v2.resize(V, 0.0);
 
     const int d = 6;
-    for (int z = settings.L / 2 - d; z < settings.L / 2 + d; z++) {
-        for (int y = settings.L / 2 - d; y < settings.L / 2 + d; y++) {
-            for (int x = settings.L / 2 - d; x < settings.L / 2 + d; x++) {
-                if (!is_inside(x, y, z)) continue;
+    for (int z = settings.L / 2 - d; z < settings.L / 2 + d; z++)
+    {
+        for (int y = settings.L / 2 - d; y < settings.L / 2 + d; y++)
+        {
+            for (int x = settings.L / 2 - d; x < settings.L / 2 + d; x++)
+            {
+                if (!is_inside(x, y, z))
+                    continue;
                 int i = g2i(x, y, z);
                 u[i] = 0.25;
                 v[i] = 0.33;
@@ -113,9 +116,12 @@ double GrayScott::laplacian(int x, int y, int z,
 void GrayScott::calc(const std::vector<double> &u, const std::vector<double> &v,
                      std::vector<double> &u2, std::vector<double> &v2)
 {
-    for (int z = 1; z < size_z + 1; z++) {
-        for (int y = 1; y < size_y + 1; y++) {
-            for (int x = 1; x < size_x + 1; x++) {
+    for (int z = 1; z < size_z + 1; z++)
+    {
+        for (int y = 1; y < size_y + 1; y++)
+        {
+            for (int x = 1; x < size_x + 1; x++)
+            {
                 const int i = l2i(x, y, z);
                 double du = 0.0;
                 double dv = 0.0;
@@ -155,13 +161,16 @@ void GrayScott::init_mpi()
     size_y = settings.L / npy;
     size_z = settings.L / npz;
 
-    if (px < settings.L % npx) {
+    if (px < settings.L % npx)
+    {
         size_x++;
     }
-    if (py < settings.L % npy) {
+    if (py < settings.L % npy)
+    {
         size_y++;
     }
-    if (pz < settings.L % npz) {
+    if (pz < settings.L % npz)
+    {
         size_z++;
     }
 
@@ -244,9 +253,12 @@ void GrayScott::exchange(std::vector<double> &u, std::vector<double> &v) const
 void GrayScott::data_no_ghost_common(const std::vector<double> &data,
                                      double *data_no_ghost) const
 {
-    for (int z = 1; z < size_z + 1; z++) {
-        for (int y = 1; y < size_y + 1; y++) {
-            for (int x = 1; x < size_x + 1; x++) {
+    for (int z = 1; z < size_z + 1; z++)
+    {
+        for (int y = 1; y < size_y + 1; y++)
+        {
+            for (int x = 1; x < size_x + 1; x++)
+            {
                 data_no_ghost[(x - 1) + (y - 1) * size_x +
                               (z - 1) * size_x * size_y] = data[l2i(x, y, z)];
             }
