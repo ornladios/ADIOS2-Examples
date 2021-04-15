@@ -1,5 +1,5 @@
 //
-// Created by ganyush on 4/12/21.
+// Created by Dmitry Ganyushin ganyushindi@ornl.gov
 //
 // Helper functions for all examples
 #include <stdio.h>

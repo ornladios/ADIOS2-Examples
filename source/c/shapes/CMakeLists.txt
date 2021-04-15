@@ -17,11 +17,3 @@ add_executable(adios2-global-array-fixed-read-c
         global-array-fixed-read.c)
 
 target_link_libraries(adios2-global-array-fixed-read-c mpivars decomp ${common_deps})
-#add_executable(adios2-global-array-fixed-read-c
-#        decomp.c
-#        mpivars.c
-#        global-array-fixed-read.c)
-#add_test_helper(adios2-global-array-fixed-write-c)
-#install( TARGETS adios2-global-array-fixed-write-c
-#        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-#        )

@@ -1,5 +1,5 @@
 //
-// Created by ganyush on 4/14/21.
+// Created by Dmitry Ganyushin ganyushindi@ornl.gov
 //
 
 #ifndef ADIOS2EXAMPLES_DECOMP_H
