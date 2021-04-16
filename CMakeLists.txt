@@ -64,7 +64,7 @@ if(MPI_FOUND)
   list(APPEND _components MPI)
 endif()
 
-find_package(ADIOS2 2.7.0 REQUIRED COMPONENTS ${_components})
+find_package(ADIOS2 2.7.1 REQUIRED COMPONENTS ${_components})
 
 find_package(Threads)
 

@@ -10,3 +10,4 @@ else()
 endif()
 
 add_subdirectory(hello-world)
+add_subdirectory(shapes)
