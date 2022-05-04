@@ -6,6 +6,7 @@
 
 #include <mpi.h>
 #include <random>
+#include <stdexcept> // runtime_error
 #include <vector>
 
 GrayScott::GrayScott(const Settings &settings, MPI_Comm comm)
@@ -29,6 +30,23 @@ void GrayScott::iterate()
 
     u.swap(u2);
     v.swap(v2);
+}
+
+void GrayScott::restart(std::vector<double> &u_in, std::vector<double> &v_in)
+{
+    auto expected_len = (size_x + 2) * (size_y + 2) * (size_z + 2);
+    if (u_in.size() == expected_len)
+    {
+        u = u_in;
+        v = v_in;
+    }
+    else
+    {
+        throw std::runtime_error(
+            "Restart with incompatible array size, expected " +
+            std::to_string(expected_len) + " got " +
+            std::to_string(u_in.size()) + " elements");
+    }
 }
 
 const std::vector<double> &GrayScott::u_ghost() const { return u; }

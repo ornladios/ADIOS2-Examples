@@ -8,18 +8,34 @@
 
 #include "../../gray-scott/common/timer.hpp"
 #include "../../gray-scott/simulation/gray-scott.h"
+#include "../../gray-scott/simulation/restart.h"
 #include "../../gray-scott/simulation/writer.h"
 
 void print_io_settings(const adios2::IO &io)
 {
     std::cout << "Simulation writes data using engine type:              "
               << io.EngineType() << std::endl;
+    auto ioparams = io.Parameters();
+    std::cout << "IO parameters:  " << std::endl;
+    for (const auto &p : ioparams)
+    {
+        std::cout << "    " << p.first << " = " << p.second << std::endl;
+    }
 }
 
-void print_settings(const Settings &s)
+void print_settings(const Settings &s, int restart_step)
 {
     std::cout << "grid:             " << s.L << "x" << s.L << "x" << s.L
               << std::endl;
+    if (restart_step > 0)
+    {
+        std::cout << "restart:          from step " << restart_step
+                  << std::endl;
+    }
+    else
+    {
+        std::cout << "restart:          no" << std::endl;
+    }
     std::cout << "steps:            " << s.steps << std::endl;
     std::cout << "plotgap:          " << s.plotgap << std::endl;
     std::cout << "F:                " << s.F << std::endl;
@@ -73,16 +89,22 @@ int main(int argc, char **argv)
     adios2::IO io_main = adios.DeclareIO("SimulationOutput");
     adios2::IO io_ckpt = adios.DeclareIO("SimulationCheckpoint");
 
-    Writer writer_main(settings, sim, io_main);
-    Writer writer_ckpt(settings, sim, io_ckpt);
+    int restart_step = 0;
+    if (settings.restart)
+    {
+        restart_step = ReadRestart(comm, settings, sim, io_ckpt);
+        io_main.SetParameter("AppendAfterSteps",
+                             std::to_string(restart_step / settings.plotgap));
+    }
 
-    writer_main.open(settings.output);
+    Writer writer_main(settings, sim, io_main);
+    writer_main.open(settings.output, (restart_step > 0));
 
     if (rank == 0)
     {
         print_io_settings(io_main);
         std::cout << "========================================" << std::endl;
-        print_settings(settings);
+        print_settings(settings, restart_step);
         print_simulator_settings(sim);
         std::cout << "========================================" << std::endl;
     }
@@ -99,7 +121,7 @@ int main(int argc, char **argv)
     log << "step\ttotal_gs\tcompute_gs\twrite_gs" << std::endl;
 #endif
 
-    for (int i = 0; i < settings.steps;)
+    for (int it = restart_step; it < settings.steps;)
     {
 #ifdef ENABLE_TIMERS
         MPI_Barrier(comm);
@@ -107,33 +129,30 @@ int main(int argc, char **argv)
         timer_compute.start();
 #endif
 
-        for (int j = 0; j < settings.plotgap; j++)
-        {
-            sim.iterate();
-            i++;
-        }
+        sim.iterate();
+        it++;
 
 #ifdef ENABLE_TIMERS
-        double time_compute = timer_compute.stop();
+        timer_compute.stop();
         MPI_Barrier(comm);
         timer_write.start();
 #endif
 
-        if (rank == 0)
+        if (it % settings.plotgap == 0)
         {
-            std::cout << "Simulation at step " << i
-                      << " writing output step     " << i / settings.plotgap
-                      << std::endl;
+            if (rank == 0)
+            {
+                std::cout << "Simulation at step " << it
+                          << " writing output step     "
+                          << it / settings.plotgap << std::endl;
+            }
+
+            writer_main.write(it, sim);
         }
 
-        writer_main.write(i, sim);
-
-        if (settings.checkpoint &&
-            i % (settings.plotgap * settings.checkpoint_freq) == 0)
+        if (settings.checkpoint && (it % settings.checkpoint_freq) == 0)
         {
-            writer_ckpt.open(settings.checkpoint_output);
-            writer_ckpt.write(i, sim);
-            writer_ckpt.close();
+            WriteCkpt(comm, it, settings, sim, io_ckpt);
         }
 
 #ifdef ENABLE_TIMERS
@@ -141,8 +160,9 @@ int main(int argc, char **argv)
         double time_step = timer_total.stop();
         MPI_Barrier(comm);
 
-        log << i << "\t" << time_step << "\t" << time_compute << "\t"
-            << time_write << std::endl;
+        log << it << "\t" << timer_total.elapsed() << "\t"
+            << timer_compute.elapsed() << "\t" << timer_write.elapsed()
+            << std::endl;
 #endif
     }
 

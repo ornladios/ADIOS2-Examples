@@ -18,6 +18,8 @@ struct Settings
     bool checkpoint;
     int checkpoint_freq;
     std::string checkpoint_output;
+    bool restart;
+    std::string restart_input;
     std::string adios_config;
     bool adios_span;
     bool adios_memory_selection;

@@ -6,13 +6,18 @@
         ============================================-->
 
     <io name="SimulationOutput">
-        <engine type="BP4">
+        <engine type="BP5">
             <!-- SST engine parameters -->
             <parameter key="RendezvousReaderCount" value="0"/>
             <parameter key="QueueLimit" value="1"/>
             <parameter key="QueueFullPolicy" value="Discard"/>
-            <!-- BP4/SST engine parameters -->
-            <parameter key="OpenTimeoutSecs" value="10.0"/>
+            <!-- BP5/SST engine parameters -->
+            <parameter key="OpenTimeoutSecs" value="60.0"/>
+            <!-- BP5 engine parameters -->
+            <parameter key="NumAggregators" value="1"/>
+            <parameter key="AsyncWrite" value="false"/>
+            <!-- BP5 reader parameter -->
+            <!--parameter key="SelectSteps" value="0:n:10"/-->
         </engine>
     </io>
 
@@ -21,13 +26,13 @@
         ===========================================-->
 
     <io name="PDFAnalysisOutput">
-        <engine type="BP4">
+        <engine type="BP5">
             <!-- SST engine parameters -->
             <parameter key="RendezvousReaderCount" value="1"/>
             <parameter key="QueueLimit" value="5"/>
             <parameter key="QueueFullPolicy" value="Block"/>
-            <!-- BP4/SST engine parameters -->
-            <parameter key="OpenTimeoutSecs" value="10.0"/>
+            <!-- BP5/SST engine parameters -->
+            <parameter key="OpenTimeoutSecs" value="60.0"/>
         </engine>
 
         <!-- Compress variables -->
@@ -51,7 +56,7 @@
         ====================================-->
 
     <io name="IsosurfaceOutput">
-        <engine type="BP4">
+        <engine type="BP5">
         </engine>
     </io>
 
@@ -60,7 +65,7 @@
         ================================================-->
 
     <io name="SimulationCheckpoint">
-        <engine type="BP4">
+        <engine type="BP5">
         </engine>
     </io>
 
@@ -68,7 +73,7 @@
     <!-- example engines
 
         <engine type="BPFile"/>
-        <engine type="BP4"/>
+        <engine type="BP5"/>
         <engine type="HDF5"/>
         <engine type="SST"/>
         <engine type="InSituMPI"/>
@@ -99,26 +104,29 @@
             <parameter key="QueueFullPolicy" value="Block"/>
         </engine>
 
-        === BP4 ===
-        BP4 is a new file format. 
-        'SubStreams' parameter controls how many files
-            are created under the output folder. By default, each process
-            writes its own file (N-to-N pattern), which is fast but is
-            not scalable to tens of thousands of processes. The number of
-            substreams should be chosen for the capability of the underlying
+        === BP5 ===
+        BP5 is a new file format. 
+        'NumAggregators' parameter controls how many files
+            are created under the output folder. By default, each compute node 
+            writes its own file which is scalable but not the fastest at small scale. 
+            The number of substreams should be chosen for the capability of the underlying
             filesystem (e.g. twice the number of OST servers on a Lustre file system).
-        'OpenTimeoutSecs' paramter specifies how long to wait on a reading Open
+        'AggregatorRatio' An alternative option to NumAggregators to pick every 
+            Nth process as aggregator.
+        'OpenTimeoutSecs' parameter specifies how long to wait on a reading Open
             for the file to appear. Useful for streaming when the reader starts up
             faster than the writer produce any output. 
-        <engine type="BPFile">
+        'AsyncWrite': true/false Perform data writing operations asynchronously 
+            after EndStep(). 
+        <engine type="BP5">
             <parameter key="SubStreams" value="4"/>
             <parameter key="OpenTimeoutSecs" value="10.0"/>
         </engine>
 
         === BPFile ===
         BPFile is a token name for the BP3 old file format.
-        It will refer to BP4 in the future. 
-        'SubStreams' parameter is the same as for BP4.
+        It will refer to BP5 in the future. 
+        'SubStreams' parameter is the same as for BP5.
         <engine type="BPFile">
             <parameter key="SubStreams" value="4"/>
         </engine>

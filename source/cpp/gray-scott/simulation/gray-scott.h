@@ -25,6 +25,7 @@ public:
 
     void init();
     void iterate();
+    void restart(std::vector<double> &u, std::vector<double> &v);
 
     const std::vector<double> &u_ghost() const;
     const std::vector<double> &v_ghost() const;
