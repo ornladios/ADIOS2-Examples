@@ -1,12 +1,11 @@
 //
 // Created by Dmitry Ganyushin ganyushindi@ornl.gov
 //
+#include "decomp.h"
+#include "mpivars.h"
+#include <adios2_c.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <adios2_c.h>
-#include "mpivars.h"
-#include "decomp.h"
-
 
 void writer(adios2_adios *adios)
 {
@@ -18,7 +17,7 @@ void writer(adios2_adios *adios)
     const int numsteps = 5;
     adios2_step_status err;
 
-    long long int fixed_shape= 0, fixed_start = 0, fixed_count = 0;
+    long long int fixed_shape = 0, fixed_start = 0, fixed_count = 0;
 
     /* Application variables
      g = 1D distributed array,
@@ -37,16 +36,17 @@ void writer(adios2_adios *adios)
     size_t count[1];
     count[0] = fixed_count;
 
-    adios2_variable *var_g = adios2_define_variable(
-        io, "GlobalArray", adios2_type_float, 1, shape, start,
-        count, adios2_constant_dims_true);
+    adios2_variable *var_g =
+        adios2_define_variable(io, "GlobalArray", adios2_type_float, 1, shape,
+                               start, count, adios2_constant_dims_true);
 
     adios2_attribute *attr =
-        adios2_define_attribute(io, "GlobalArray/info", adios2_type_string,  ga);
+        adios2_define_attribute(io, "GlobalArray/info", adios2_type_string, ga);
 
     adios2_engine *engine =
         adios2_open(io, "adios2-global-array-fixed-c.bp", adios2_mode_write);
-    printf("Decmp rank = %d global shape = %lld local count = %lld  offset = %lld\n",
+    printf("Decmp rank = %d global shape = %lld local count = %lld  offset = "
+           "%lld\n",
            rank, fixed_shape, fixed_count, fixed_start);
     for (step = 0; step < numsteps; step++)
     {
@@ -63,10 +63,15 @@ void writer(adios2_adios *adios)
     adios2_close(engine);
     free(g);
 
-    if (rank == 0){
+    if (rank == 0)
+    {
         printf("Try the following: \n");
-        printf("  bpls -la adios2-global-array-fixed-c.bp GlobalArray -d -n %lld \n", fixed_shape);
-        printf("  bpls -la adios2-global-array-fixed-c.bp GlobalArray -d -t -n %lld \n ", fixed_shape);
+        printf("  bpls -la adios2-global-array-fixed-c.bp GlobalArray -d -n "
+               "%lld \n",
+               fixed_shape);
+        printf("  bpls -la adios2-global-array-fixed-c.bp GlobalArray -d -t -n "
+               "%lld \n ",
+               fixed_shape);
         printf("  mpirun -n 2 ./adios2-global-array-fixed-read-c \n");
     }
 }
@@ -79,10 +84,23 @@ int main(int argc, char *argv[])
 
     {
 #if ADIOS2_USE_MPI
-
-        adios2_adios *adios = adios2_init(MPI_COMM_WORLD, adios2_debug_mode_on);
+/* Test for ADIOS2 > 2.9.0 */
+#if defined(ADIOS2_VERSION) && (ADIOS2_VERSION > 20900)
+        // use adios_init without debug flag
+        adios2_adios *adios = adios2_init(MPI_COMM_WORLD);
 #else
+        // specify deprecated debug flag
+        adios2_adios *adios = adios2_init(MPI_COMM_WORLD, adios2_debug_mode_on);
+#endif
+#else
+/* Test for ADIOS2 > 2.9.0 */
+#if defined(ADIOS2_VERSION) && (ADIOS2_VERSION > 20900)
+        // use adios_init without debug flag
+        adios2_adios *adios = adios2_init();
+#else
+        // specify deprecated debug flag
         adios2_adios *adios = adios2_init(adios2_debug_mode_on);
+#endif
 #endif
 
         writer(adios);
