@@ -48,7 +48,7 @@ int ReadRestart(MPI_Comm comm, const Settings &settings, GrayScott &sim,
     MPI_Comm_size(comm, &nproc);
     if (!rank)
     {
-        std::cout << "restart from file" << settings.restart_input << std::endl;
+        std::cout << "restart from file " << settings.restart_input << std::endl;
     }
     adios2::Engine reader =
         io.Open(settings.restart_input, adios2::Mode::ReadRandomAccess);
