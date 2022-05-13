@@ -13,7 +13,7 @@ if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_CURRENT_BINARY_DIR)
     "separate from the source directory")
 endif()
 
-project(ADIOS2Examples LANGUAGES C CXX VERSION 2.7.0)
+project(ADIOS2Examples LANGUAGES C CXX VERSION 2.8.0)
 
 include(CheckLanguage)
 check_language(Fortran)
