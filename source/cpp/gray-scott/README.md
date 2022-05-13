@@ -124,3 +124,67 @@ $ mpirun -n 4 adios2-gray-scott settings-staging.json : \
          -n 1 python3 gsplot.py -i gs.bp
 ```
 
+## In situ batch visualization with ParaView Catalyst
+
+This requires ADIOS 2.8.0 or later, due to the use of `ParaViewFidesEngine` plugin for ADIOS.
+Internally, this plugin uses the ADIOS inline engine to pass data pointers to ParaView's
+[Fides](https://fides.readthedocs.io/en/latest/) reader
+and uses ParaView [Catalyst](https://catalyst-in-situ.readthedocs.io/en/latest/index.html)
+to process a user python script that contains a ParaView pipeline.
+Fides is a library that provides a schema for reading ADIOS data into visualization services
+such as ParaView. By integrating it with ParaView Catalyst, it is now possible to perform
+in situ visualization with ADIOS2-enabled codes without writing adaptors. All that is needed
+from the user is a simple JSON file describing the data.
+
+
+`simulation/settings-inline.json` uses the `adios2-inline-plugin.xml` configuration file.
+It sets the engine type to `plugin` and provides the `PluginName` and `PluginLibrary`
+parameters required when using engine plugins. In addition, you will need to set the
+environment variable `ADIOS2_PLUGIN_PATH` to contain the path to the `libADIOSInSituPlugin.so`
+shared library built by ParaView.
+
+In the `catalyst` dir, there is a `gs-fides.json`, which is the data model Fides uses to read the data.
+The `gs-pipeline.py` contains the pipeline Catalyst will execute on each step.
+These files are passed as parameters to the engine plugin (see parameters `DataModel` and `Script` in
+the `adios2-inline-plugin.xml` file).
+
+
+### Build and Run
+
+This example is built as normal (making sure you are using ADIOS v2.8.0 or later)
+and does not have build dependencies on ParaView.
+
+The changes for this example are not yet in ParaView, but you can use the following instructions
+for grabbing the branches necessary to run:
+
+```
+$ git clone --recursive https://gitlab.kitware.com/caitlin.ross/paraview.git
+$ mkdir paraview-build
+$ cd paraview
+$ git checkout catalyst-fides
+$ cd paraview/VTK
+$ git remote add caitlin.ross https://gitlab.kitware.com/caitlin.ross/vtk.git
+$ git fetch caitlin.ross fides-inline-engine
+$ git checkout fides-inline-engine
+$ cd ../../paraview-build
+```
+
+Now we're ready to build:
+
+```
+$ cmake -GNinja -DPARAVIEW_USE_PYTHON=ON -DPARAVIEW_USE_MPI=ON -DPARAVIEW_ENABLE_FIDES=ON -DADIOS2_DIR=/path/to/adios2.8.0 -DCMAKE_BUILD_TYPE=Release ../paraview
+$ ninja
+```
+
+The lib directory should contain `libADIOSInSituPlugin.so`.
+Set the following env variables.
+```
+$ export ADIOS2_PLUGIN_PATH=/path/to/paraview-build/lib
+$ export CATALYST_IMPLEMENTATION_NAME=paraview
+$ export CATALYST_IMPLEMENTATION_PATHS=/path/to/paraview-build/lib/catalyst
+```
+
+To run:
+```
+$ mpirun -n 4 build/gray-scott simulation/settings-inline.json
+```
