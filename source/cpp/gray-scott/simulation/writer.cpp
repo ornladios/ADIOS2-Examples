@@ -77,9 +77,14 @@ Writer::Writer(const Settings &settings, const GrayScott &sim, adios2::IO io)
     var_step = io.DefineVariable<int>("step");
 }
 
-void Writer::open(const std::string &fname)
+void Writer::open(const std::string &fname, bool append)
 {
-    writer = io.Open(fname, adios2::Mode::Write);
+    adios2::Mode mode = adios2::Mode::Write;
+    if (append)
+    {
+        mode = adios2::Mode::Append;
+    }
+    writer = io.Open(fname, mode);
 }
 
 void Writer::write(int step, const GrayScott &sim)
