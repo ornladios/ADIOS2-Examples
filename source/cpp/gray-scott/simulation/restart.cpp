@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+static bool firstCkpt = true;
+
 void WriteCkpt(MPI_Comm comm, const int step, const Settings &settings,
                const GrayScott &sim, adios2::IO io)
 {
@@ -18,18 +20,28 @@ void WriteCkpt(MPI_Comm comm, const int step, const Settings &settings,
         adios2::Variable<double> var_v;
         adios2::Variable<int> var_step;
 
-        size_t X = sim.size_x + 2;
-        size_t Y = sim.size_y + 2;
-        size_t Z = sim.size_z + 2;
-        size_t R = static_cast<size_t>(rank);
-        size_t N = static_cast<size_t>(nproc);
+        if (firstCkpt)
+        {
+            size_t X = sim.size_x + 2;
+            size_t Y = sim.size_y + 2;
+            size_t Z = sim.size_z + 2;
+            size_t R = static_cast<size_t>(rank);
+            size_t N = static_cast<size_t>(nproc);
 
-        var_u = io.DefineVariable<double>("U", {N, X, Y, Z}, {R, 0, 0, 0},
-                                          {1, X, Y, Z});
-        var_v = io.DefineVariable<double>("V", {N, X, Y, Z}, {R, 0, 0, 0},
-                                          {1, X, Y, Z});
+            var_u = io.DefineVariable<double>("U", {N, X, Y, Z}, {R, 0, 0, 0},
+                                            {1, X, Y, Z});
+            var_v = io.DefineVariable<double>("V", {N, X, Y, Z}, {R, 0, 0, 0},
+                                            {1, X, Y, Z});
 
-        var_step = io.DefineVariable<int>("step");
+            var_step = io.DefineVariable<int>("step");
+            firstCkpt = false;
+        }
+        else
+        {
+            var_u = io.InquireVariable<double>("U");
+            var_v = io.InquireVariable<double>("V");
+            var_step = io.InquireVariable<int>("step");
+        }
 
         writer.Put<int>(var_step, &step);
         writer.Put<double>(var_u, sim.u_ghost().data());
