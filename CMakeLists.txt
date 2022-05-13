@@ -13,7 +13,7 @@ if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_CURRENT_BINARY_DIR)
     "separate from the source directory")
 endif()
 
-project(ADIOS2Examples LANGUAGES C CXX VERSION 2.7.0)
+project(ADIOS2Examples LANGUAGES C CXX VERSION 2.8.0)
 
 include(CheckLanguage)
 check_language(Fortran)
@@ -64,7 +64,7 @@ if(MPI_FOUND)
   list(APPEND _components MPI)
 endif()
 
-find_package(ADIOS2 2.7.1 REQUIRED COMPONENTS ${_components})
+find_package(ADIOS2 2.8.0 REQUIRED COMPONENTS ${_components})
 
 find_package(Threads)
 

@@ -30,7 +30,7 @@ RUN cd /tmp/Software &&\
     make install
 
 RUN cd /tmp/Software &&\
-    git clone https://github.com/ornladios/ADIOS2.git --single-branch --branch v2.7.0 --depth 1 &&\
+    git clone https://github.com/ornladios/ADIOS2.git --single-branch --branch v2.8.0 --depth 1 &&\
     mkdir -p ADIOS2-build &&\
     cd ADIOS2-build &&\
     cmake -DCMAKE_INSTALL_PREFIX=/opt/adios2 \
