@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
     {
 #if ADIOS2_USE_MPI
 /* Test for ADIOS2 > 2.9.0 */
-#if defined(ADIOS2_VERSION) && (ADIOS2_VERSION > 20900)
+#if (defined(ADIOS2_VERSION) && (ADIOS2_VERSION > 20900)) || defined(ADIOS2_DEBUGMODE_REMOVED)
         // use adios_init without debug flag
         adios2_adios *adios = adios2_init(MPI_COMM_WORLD);
 #else
@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
 #endif
 #else
 /* Test for ADIOS2 > 2.9.0 */
-#if defined(ADIOS2_VERSION) && (ADIOS2_VERSION > 20900)
+#if (defined(ADIOS2_VERSION) && (ADIOS2_VERSION > 20900)) || defined(ADIOS2_DEBUGMODE_REMOVED)
         // use adios_init without debug flag
         adios2_adios *adios = adios2_init();
 #else
