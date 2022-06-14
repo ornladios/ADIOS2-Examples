@@ -48,6 +48,11 @@ A particularly good example is the Inline engine that is used to run an analysis
 PerformPuts/PerformGets
 ***********************
 
-The ADIOS2 API has PerformGets and PerformPuts functions for the situation when one can Put/Get multiple variables in one batch, then another set of variables, within one step. These function enfore Sync mode for all Puts and Gets called before it. In practice, one really does not need to bother with these functions. 
+The ADIOS2 API has PerformGets and PerformPuts functions for the
+situation when one can Put/Get multiple variables in one batch, then
+another set of variables, within one step. These function enfore Sync
+mode for all Puts and Gets called before it. However, PerformPuts()
+can lower performance in some engines, so it should not be used
+unnecessarily.  In particular, calling PerformPuts() just prior to
+EndStep() is at best unnecessary and may result in lower performance.
 
-Technically, EndStep always calls PerformGets/PerformPuts to do this part of IO and then publishes the entire step for any readers, but this topic belongs to Engine development, not for users.
