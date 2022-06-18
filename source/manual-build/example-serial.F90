@@ -11,7 +11,11 @@ program example_serial
     type(adios2_io) :: io
     type(adios2_engine) :: engine
 
+#if (defined(ADIOS2_VERSION) && (ADIOS2_VERSION >= 20900)) || defined(ADIOS2_DEBUGMODE_REMOVED)
+    call adios2_init(adios, ierr)
+#else
     call adios2_init(adios, adios2_debug_mode_on, ierr)
+#endif
 
     call writer()
     call reader()
