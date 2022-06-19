@@ -15,11 +15,8 @@ program example_mpi
     call MPI_Init(ierr)
     call MPI_Comm_rank(MPI_COMM_WORLD, irank, ierr)
     call MPI_Comm_size(MPI_COMM_WORLD, isize, ierr)
-#if (defined(ADIOS2_VERSION) && (ADIOS2_VERSION >= 20900)) || defined(ADIOS2_DEBUGMODE_REMOVED)
-    call adios2_init(adios, MPI_COMM_WORLD, ierr)
-#else
+
     call adios2_init(adios, MPI_COMM_WORLD, adios2_debug_mode_on, ierr)
-#endif
 
     call writer()
     call reader()
