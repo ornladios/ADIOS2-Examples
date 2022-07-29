@@ -9,7 +9,7 @@
         <engine type="plugin">
             <!-- general plugin engine parameters -->
             <parameter key="PluginName" value="fides"/>
-            <parameter key="PluginLibrary" value="ADIOSInSituPlugin"/>
+            <parameter key="PluginLibrary" value="ParaViewADIOSInSituEngine"/>
             <!-- ParaViewFides engine parameters -->
             <parameter key="DataModel" value="catalyst/gs-fides.json"/>
             <parameter key="Script" value="catalyst/gs-pipeline.py"/>

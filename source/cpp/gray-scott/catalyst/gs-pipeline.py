@@ -4,6 +4,7 @@ from paraview import print_info
 # catalyst options
 from paraview.catalyst import Options
 options = Options()
+options.EnableCatalystLive = 1
 
 # print start marker
 print_info("begin '%s'", __name__)
@@ -50,7 +51,7 @@ extractor.Writer.ImageResolution = [800, 800]
 def catalyst_execute(info):
     print_info("in '%s::catalyst_execute'", __name__)
     global producer
-    producer.UpdatePipeline()
+    clip.UpdatePipeline()
     print("updating pipeline and saving image")
 
     #print("-----------------------------------")
