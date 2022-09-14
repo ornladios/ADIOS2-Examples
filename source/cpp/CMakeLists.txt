@@ -13,6 +13,7 @@ add_subdirectory(basics)
 
 if(MPI_FOUND)
   add_subdirectory(gray-scott)
+  add_subdirectory(gray-scott-struct)
 endif()
 
 add_subdirectory(hello-world)
