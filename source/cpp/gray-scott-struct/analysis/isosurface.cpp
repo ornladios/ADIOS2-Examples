@@ -172,7 +172,8 @@ void write_adios(adios2::Engine &writer,
 
 int main(int argc, char *argv[])
 {
-    MPI_Init(&argc, &argv);
+    int provided;
+    MPI_Init_thread(&argc, &argv, MPI_THREAD_MULTIPLE, &provided);
 
     int rank, procs, wrank;
 
