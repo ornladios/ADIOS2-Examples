@@ -113,7 +113,8 @@ void printUsage()
  */
 int main(int argc, char *argv[])
 {
-    MPI_Init(&argc, &argv);
+    int provided;
+    MPI_Init_thread(&argc, &argv, MPI_THREAD_MULTIPLE, &provided);
     int rank, comm_size, wrank;
 
     MPI_Comm_rank(MPI_COMM_WORLD, &wrank);

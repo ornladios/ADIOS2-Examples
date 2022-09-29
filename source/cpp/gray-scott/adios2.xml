@@ -11,6 +11,7 @@
             <parameter key="RendezvousReaderCount" value="0"/>
             <parameter key="QueueLimit" value="1"/>
             <parameter key="QueueFullPolicy" value="Discard"/>
+            <parameter key="DataTransport" value="MPI"/>
             <!-- BP5/SST engine parameters -->
             <parameter key="OpenTimeoutSecs" value="60.0"/>
             <!-- BP5 engine parameters -->
