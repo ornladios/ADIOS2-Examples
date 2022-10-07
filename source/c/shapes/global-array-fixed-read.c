@@ -26,7 +26,7 @@ void reader(adios2_adios *adios)
     size_t count[1];
     count[0] = fixed_count;
 
-    adios2_engine *engine = adios2_open(io, streamname, adios2_step_mode_read);
+    adios2_engine *engine = adios2_open(io, streamname, adios2_mode_read);
     step = 0;
     do
     {
@@ -73,9 +73,9 @@ int main(int argc, char *argv[])
     {
 #if ADIOS2_USE_MPI
 
-        adios2_adios *adios = adios2_init(MPI_COMM_WORLD, adios2_debug_mode_on);
+        adios2_adios *adios = adios2_init_mpi(MPI_COMM_WORLD);
 #else
-        adios2_adios *adios = adios2_init(adios2_debug_mode_on);
+        adios2_adios *adios = adios2_init();
 #endif
         reader(adios);
         adios2_finalize(adios);

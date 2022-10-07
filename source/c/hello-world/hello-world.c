@@ -48,9 +48,9 @@ int main(int argc, char *argv[])
 
     {
 #if ADIOS2_USE_MPI
-        adios2_adios *adios = adios2_init(MPI_COMM_WORLD, adios2_debug_mode_on);
+        adios2_adios *adios = adios2_init_mpi(MPI_COMM_WORLD);
 #else
-        adios2_adios *adios = adios2_init(adios2_debug_mode_on);
+        adios2_adios *adios = adios2_init();
 #endif
 
         const char greeting[] = "Hello World from ADIOS2";
