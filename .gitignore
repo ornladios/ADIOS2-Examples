@@ -10,6 +10,9 @@
 .settings/
 .pydevproject
 
+# VS Code
+.vscode/
+
 #binary, library, or temporary build files
 *.o
 *.a
@@ -26,3 +29,7 @@ build*/
 
 # Mac OSX finder-related files
 .DS_Store
+
+# julia
+Manifest.toml
+
