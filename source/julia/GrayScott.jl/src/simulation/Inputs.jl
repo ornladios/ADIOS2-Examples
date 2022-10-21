@@ -5,22 +5,25 @@ module Inputs
 export get_settings
 
 import ArgParse
+import JSON
+
+import ..Helper
+import ..GrayScott
 
 # public facing function
 function get_settings(args::Vector{String}, comm)
     config_file = _parse_args(args)
 
-    if endWith(config_file, ".json")
-        return _parse_settings_json(config_file, comm)
+    config_file_contents::String = Helper.bcast_file_contents(config_file, comm)
+
+    if endswith(config_file, ".json")
+        return _parse_settings_json(config_file_contents)
     end
 
     return
 end
 
 # local scope functions
-function _parse_settings_json(config_file::String, comm)
-end
-
 function _parse_args(args::Vector{String};
                      error_handler = ArgParse.default_handler)::String
     s = ArgParse.ArgParseSettings(description = "gray-scott workflow simulation example configuration file, Julia version, GrayScott.jl",
@@ -46,6 +49,23 @@ function _parse_args(args::Vector{String};
     end
 
     return config_file
+end
+
+function _parse_settings_json(json_contents::String)
+    json = JSON.parse(json_contents)
+    settings = GrayScott.Settings()
+
+    # Iterate through dictionary pairs
+    for (key, value) in json
+        # Iterate through predefined keys
+        if key in GrayScott.SettingsKeys
+            setproperty!(settings, Symbol(key), value)
+        end
+    end
+
+    println(settings)
+
+    return
 end
 
 end # module

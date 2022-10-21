@@ -1,16 +1,15 @@
 
 import MPI
 
-function bcast_file(file_name::String, comm)
-    rank = MPI.Comm_rank(comm)
-    if rank == 0
-        io = open(file_name, "r")
-        @show typeof(io)
-        data = read(io)
-        @show length(data)
-        # buffer::Vector{Int8}
-        # read!(io, buffer)
-        #println(io)
-    else
+export bcase_file
+
+function bcast_file_contents(file_name::String, comm, root = 0)::String
+    size::UInt32 = 0
+    data::Vector{UInt8} = []
+    if MPI.Comm_rank(comm) == root
+        data = read(open(file_name, "r"))
     end
+
+    data = MPI.bcast(data, comm)
+    return String(data)
 end

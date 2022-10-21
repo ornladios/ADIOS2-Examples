@@ -24,7 +24,29 @@ Base.@kwdef mutable struct Settings
     restart::Bool = false
     restart_input::String = "ckpt.bp"
     adios_config::String = "adios2.yaml"
-    adios_span::String = false
+    adios_span::Bool = false
     adios_memory_selection::Bool = false
     mesh_type::String = "image"
 end
+
+SettingsKeys = Set{String}([
+                               "L",
+                               "steps",
+                               "plotgap",
+                               "F",
+                               "k",
+                               "dt",
+                               "Du",
+                               "Dv",
+                               "noise",
+                               "output",
+                               "checkpoint",
+                               "checkpoint_freq",
+                               "checkpoint_output",
+                               "restart",
+                               "restart_input",
+                               "adios_config",
+                               "adios_span",
+                               "adios_memory_selection",
+                               "mesh_type",
+                           ])
