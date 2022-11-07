@@ -27,6 +27,8 @@ Base.@kwdef mutable struct Settings
     adios_span::Bool = false
     adios_memory_selection::Bool = false
     mesh_type::String = "image"
+    precision::String = "Float64"
+    backend::String = "CPU"
 end
 
 SettingsKeys = Set{String}([
@@ -49,4 +51,49 @@ SettingsKeys = Set{String}([
                                "adios_span",
                                "adios_memory_selection",
                                "mesh_type",
+                               "precision",
+                               "backend",
                            ])
+
+Base.@kwdef mutable struct MPICartDomain
+    cart_comm::MPI.Comm = MPI.COMM_NULL
+
+    # Cartesian communicator info
+    # Could used StaticArrays.jl?
+    # start dims with zeros
+    dims::Vector{Int32} = zeros(Int32, 3)
+    coords::Vector{Int32} = zeros(Int32, 3)
+
+    # local process mesh sizes and offsets in Cartesian domain info, using defaults
+    proc_sizes::Vector{Int64} = [128, 128, 128]
+    proc_offsets::Vector{Int64} = [1, 1, 1]
+
+    # couldn't use NamedTuples as struct is mutable
+    proc_neighbors = Dict{String, Int32}("west" => -1, "east" => -1, "up" => -1,
+                                         "down" => -1, "north" => -1,
+                                         "south" => -1)
+end
+
+"""
+Carry the physical field outputs: u and v
+@TODO: must implement for GPU arrays
+"""
+mutable struct Fields{T, N, A <: AbstractArray{T, N}}
+    u::A
+    v::A
+    u_temp::A
+    v_temp::A
+    # MPI Datatypes for halo exchange MPI.Datatype(T)
+    xy_face_t::MPI.Datatype
+    xz_face_t::MPI.Datatype
+    yz_face_t::MPI.Datatype
+end
+
+struct IOStream
+    adios::ADIOS2.Adios
+    io::ADIOS2.AIO
+    engine::ADIOS2.Engine
+    var_step::ADIOS2.Variable
+    var_U::ADIOS2.Variable
+    var_V::ADIOS2.Variable
+end

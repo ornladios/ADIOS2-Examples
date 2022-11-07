@@ -1,15 +1,15 @@
 {
-    "L": 64,
+    "L": 512,
     "Du": 0.2,
     "Dv": 0.1,
-    "F": 0.01,
-    "k": 0.05,
-    "dt": 2.0,
-    "plotgap": 10,
-    "steps": 1000,
-    "noise": 0.0000001,
-    "output": "gs.bp",
-    "checkpoint": true,
+    "F": 0.02,
+    "k": 0.048,
+    "dt": 1.0,
+    "plotgap": 200,
+    "steps": 10000,
+    "noise": 0.1,
+    "output": "gs-julia-1MPI-512L.bp",
+    "checkpoint": false,
     "checkpoint_freq": 700,
     "checkpoint_output": "ckpt.bp",
     "restart": false,
@@ -17,5 +17,7 @@
     "adios_config": "adios2.xml",
     "adios_span": false,
     "adios_memory_selection": false,
-    "mesh_type": "image"
+    "mesh_type": "image",
+    "precision": "Float32",
+    "backend": "CUDA"
 }
