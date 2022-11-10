@@ -47,13 +47,15 @@ def SetupCatalystProducer():
 
 # this returns the fides proxy which should be used for post hoc vis
 # i.e., you're reading .bp files
-def SetupFidesReader(json, bp):
+def SetupFidesReader(json, bp, sst):
     if json is None:
         # in this case the bp file must contain the Fides attributes
         fides = FidesReader(StreamSteps=1, FileName=bp)
         return fides
 
     fides = FidesJSONReader(StreamSteps=1, FileName=json)
+    if sst:
+        fides.DataSourceEngines = ['source', 'SST']
     # 'source' is the name of the ADIOS data source in the JSON data model
     fides.DataSourcePath = ['source', bp]
     # required to update the fides reader
@@ -130,20 +132,20 @@ def ParseArgs():
     parser = argparse.ArgumentParser()
     parser.add_argument("-j", "--json_filename", help="path to Fides JSON file", type=str, required=False)
     parser.add_argument("-b", "--bp_filename", help="path to bp file", type=str, required=True)
+    parser.add_argument("--staging", help="use SST engine", action='store_true')
     args = parser.parse_args()
     return args
 
 
-def PostHocVis(args):
+def StreamingVis(args):
     # adios/fides step status
     OK = 0
     NotReady = 1
     EndOfStream = 2
 
     # setup the reader, view, pipeline
-    fides = SetupFidesReader(args.json_filename, args.bp_filename)
+    fides = SetupFidesReader(args.json_filename, args.bp_filename, args.staging)
     view = SetupRenderView()
-    pipeline, display = SetupVisPipeline(fides, view)
 
     step = 0
     while True:
@@ -172,7 +174,7 @@ def PostHocVis(args):
 if __name__ == '__main__':
     print('in __main__()')
     args = ParseArgs()
-    PostHocVis(args)
+    StreamingVis(args)
 else:
     # in this case we're running from Catalyst
     view = SetupRenderView()
