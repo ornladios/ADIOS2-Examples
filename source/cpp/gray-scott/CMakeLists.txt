@@ -19,7 +19,7 @@ target_link_libraries(adios2-pdf-calc adios2::adios2 MPI::MPI_C)
 install(TARGETS adios2-pdf-calc 
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}) 
 
-install(FILES "adios2.xml" "adios2-inline-plugin.xml"
+install(FILES "adios2.xml" "adios2-inline-plugin.xml" "adios2-fides-staging.xml"
                            "visit-bp4.session" "visit-bp4.session.gui" 
                            "visit-sst.session" "visit-sst.session.gui"                  
                            "simulation/settings-files.json"

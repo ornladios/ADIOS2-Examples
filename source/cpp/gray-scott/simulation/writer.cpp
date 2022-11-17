@@ -56,6 +56,19 @@ Writer::Writer(const Settings &settings, const GrayScott &sim, adios2::IO io)
         define_bpvtk_attribute(settings, io);
     }
 
+    // add attributes for Fides
+    io.DefineAttribute<std::string>("Fides_Data_Model", "uniform");
+    double origin[3] = {0.0, 0.0, 0.0};
+    io.DefineAttribute<double>("Fides_Origin", &origin[0], 3);
+    double spacing[3] = {0.1, 0.1, 0.1};
+    io.DefineAttribute<double>("Fides_Spacing", &spacing[0], 3);
+    io.DefineAttribute<std::string>("Fides_Dimension_Variable", "U");
+
+    std::vector<std::string> varList = {"U", "V"};
+    std::vector<std::string> assocList = {"points", "points"};
+    io.DefineAttribute<std::string>("Fides_Variable_List", varList.data(), varList.size());
+    io.DefineAttribute<std::string>("Fides_Variable_Associations", assocList.data(), assocList.size());
+
     var_u =
         io.DefineVariable<double>("U", {settings.L, settings.L, settings.L},
                                   {sim.offset_z, sim.offset_y, sim.offset_x},

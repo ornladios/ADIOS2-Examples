@@ -124,9 +124,9 @@ $ mpirun -n 4 adios2-gray-scott settings-staging.json : \
          -n 1 python3 gsplot.py -i gs.bp
 ```
 
-## In situ batch visualization with ParaView Catalyst
+## In situ batch and interactive visualization with ParaView Catalyst
 
-This requires ADIOS 2.8.0 or later, due to the use of `ParaViewFidesEngine` plugin for ADIOS.
+This requires ADIOS 2.9.0 or later, due to the use of `ParaViewADIOSInSituEngine` plugin for ADIOS.
 Internally, this plugin uses the ADIOS inline engine to pass data pointers to ParaView's
 [Fides](https://fides.readthedocs.io/en/latest/) reader
 and uses ParaView [Catalyst](https://catalyst-in-situ.readthedocs.io/en/latest/index.html)
@@ -140,8 +140,8 @@ from the user is a simple JSON file describing the data.
 `simulation/settings-inline.json` uses the `adios2-inline-plugin.xml` configuration file.
 It sets the engine type to `plugin` and provides the `PluginName` and `PluginLibrary`
 parameters required when using engine plugins. In addition, you will need to set the
-environment variable `ADIOS2_PLUGIN_PATH` to contain the path to the `libADIOSInSituPlugin.so`
-shared library built by ParaView.
+environment variable `ADIOS2_PLUGIN_PATH` to contain the path to the `libParaViewADIOSInSituPlugin.so`
+shared library built by ADIOS.
 
 In the `catalyst` dir, there is a `gs-fides.json`, which is the data model Fides uses to read the data.
 The `gs-pipeline.py` contains the pipeline Catalyst will execute on each step.
@@ -151,35 +151,41 @@ the `adios2-inline-plugin.xml` file).
 
 ### Build and Run
 
-This example is built as normal (making sure you are using ADIOS v2.8.0 or later)
+This example is built as normal (making sure you are using ADIOS v2.9.0 or later)
 and does not have build dependencies on ParaView.
 
-The changes for this example are not yet in ParaView, but you can use the following instructions
-for grabbing the branches necessary to run:
+This example requires ParaView 5.11, which is currently in release phase.
+In order to perform in situ visualization, you'll need to build from source.
+First build the [Catalyst](https://gitlab.kitware.com/paraview/catalyst) stub library.
 
 ```
-$ git clone --recursive https://gitlab.kitware.com/caitlin.ross/paraview.git
+$ git clone https://gitlab.kitware.com/paraview/catalyst.git
+$ mkdir catalyst-build
+$ cd catalyst
+$ git checkout v2.0.0-rc3
+$ cd ../catalyst-build
+$ cmake -GNinja -DCATALYST_USE_MPI=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/path/to/install/catalyst ../catalyst
+$ ninja && ninja install
+```
+
+Now you'll need to build ParaView using the following instructions:
+
+```
+$ git clone --recursive https://gitlab.kitware.com/paraview/paraview.git
 $ mkdir paraview-build
 $ cd paraview
-$ git checkout catalyst-fides
-$ cd paraview/VTK
-$ git remote add caitlin.ross https://gitlab.kitware.com/caitlin.ross/vtk.git
-$ git fetch caitlin.ross fides-inline-engine
-$ git checkout fides-inline-engine
-$ cd ../../paraview-build
-```
-
-Now we're ready to build:
-
-```
-$ cmake -GNinja -DPARAVIEW_USE_PYTHON=ON -DPARAVIEW_USE_MPI=ON -DPARAVIEW_ENABLE_FIDES=ON -DADIOS2_DIR=/path/to/adios2.8.0 -DCMAKE_BUILD_TYPE=Release ../paraview
+$ git checkout v5.11.0-RC2
+$ git submodule update --init --recursive
+$ cd ../paraview-build
+$ cmake -GNinja -DPARAVIEW_USE_PYTHON=ON -DPARAVIEW_USE_MPI=ON -DPARAVIEW_ENABLE_FIDES=ON -DPARAVIEW_ENABLE_CATALYST=ON \
+-DADIOS2_DIR=/path/to/adios2.8.0 -Dcatalyst_DIR=/path/to/catalyst -DCMAKE_BUILD_TYPE=Release ../paraview
 $ ninja
 ```
 
-The lib directory should contain `libADIOSInSituPlugin.so`.
+The ADIOS2 lib directory should contain `libParaViewADIOSInSituEngine.so`.
 Set the following env variables.
 ```
-$ export ADIOS2_PLUGIN_PATH=/path/to/paraview-build/lib
+$ export ADIOS2_PLUGIN_PATH=/path/to/adios2-build/lib
 $ export CATALYST_IMPLEMENTATION_NAME=paraview
 $ export CATALYST_IMPLEMENTATION_PATHS=/path/to/paraview-build/lib/catalyst
 ```
@@ -188,3 +194,16 @@ To run:
 ```
 $ mpirun -n 4 build/gray-scott simulation/settings-inline.json
 ```
+
+### Interactive visualization
+
+Open the ParaView GUI. `/path/to/paraview/build/bin/paraview`
+On the `Catalyst` menu, click `Connect`. You can leave the default port of 22222.
+Hit Ok.
+Then in the `Catalyst` click `Pause Simulation`.
+Now you can run the simulation, same as above.
+The simulation will start and Catalyst will connect to ParaView.
+At this point you can click the gray buttons beside the extracts. This will pull the data to
+ParaView, allowing you to interact with it. When you're ready for the simulation to resume,
+in the `Catalyst` menu, click `Continue`. You will see the visualizations update as the simulation runs.
+You can make edits to your pipeline and pause/continue the simulation.
