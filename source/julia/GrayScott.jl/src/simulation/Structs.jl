@@ -76,7 +76,7 @@ end
 
 """
 Carry the physical field outputs: u and v
-@TODO: must implement for GPU arrays
+Using AbstractArray to allow for Array, CuArray and ROCArray
 """
 mutable struct Fields{T, N, A <: AbstractArray{T, N}}
     u::A
@@ -89,6 +89,9 @@ mutable struct Fields{T, N, A <: AbstractArray{T, N}}
     yz_face_t::MPI.Datatype
 end
 
+"""
+Carry the I/O information for outputs
+"""
 struct IOStream
     adios::ADIOS2.Adios
     io::ADIOS2.AIO

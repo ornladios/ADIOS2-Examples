@@ -1,36 +1,36 @@
 
-import CUDA
+import AMDGPU
 
-function _init_fields_cuda(settings::Settings, mcd::MPICartDomain,
-                           T)::Fields{T, 3,
-                                      CUDA.CuArray{T, 3, CUDA.Mem.DeviceBuffer}}
+function _init_fields_amdgpu(settings::Settings, mcd::MPICartDomain,
+                             T)::Fields{T, 3, AMDGPU.ROCArray{T, 3}}
     size_x = mcd.proc_sizes[1]
     size_y = mcd.proc_sizes[2]
     size_z = mcd.proc_sizes[3]
 
     # should be ones
-    u = CUDA.ones(T, size_x + 2, size_y + 2, size_z + 2)
-    v = CUDA.zeros(T, size_x + 2, size_y + 2, size_z + 2)
+    u = AMDGPU.ones(T, size_x + 2, size_y + 2, size_z + 2)
+    v = AMDGPU.zeros(T, size_x + 2, size_y + 2, size_z + 2)
 
-    u_temp = CUDA.zeros(T, size_x + 2, size_y + 2, size_z + 2)
-    v_temp = CUDA.zeros(T, size_x + 2, size_y + 2, size_z + 2)
+    u_temp = AMDGPU.zeros(T, size_x + 2, size_y + 2, size_z + 2)
+    v_temp = AMDGPU.zeros(T, size_x + 2, size_y + 2, size_z + 2)
 
-    cu_offsets = CUDA.CuArray(mcd.proc_offsets)
-    cu_sizes = CUDA.CuArray(mcd.proc_sizes)
+    roc_offsets = AMDGPU.ROCArray(mcd.proc_offsets)
+    roc_sizes = AMDGPU.ROCArray(mcd.proc_sizes)
 
     d::Int64 = 6
     minL = Int64(settings.L / 2 - d)
     maxL = Int64(settings.L / 2 + d)
 
-    # @TODO: get ideal blocks and threads
+    # @TODO: get ideal grid size and threads
     threads = (16, 16)
-    blocks = (settings.L, settings.L)
+    # grid size must be the total number of threads of each direction
+    grid = (settings.L, settings.L)
 
-    CUDA.@cuda threads=threads blocks=blocks _populate!(u, v,
-                                                        cu_offsets,
-                                                        cu_sizes,
-                                                        minL, maxL)
-    CUDA.synchronize()
+    AMDGPU.wait(AMDGPU.@roc groupsize=threads gridsize=grid _populate!(u, v,
+                                                                       roc_offsets,
+                                                                       roc_sizes,
+                                                                       minL,
+                                                                       maxL))
 
     xy_face_t, xz_face_t, yz_face_t = _get_mpi_faces(size_x, size_y, size_z, T)
 
@@ -38,8 +38,8 @@ function _init_fields_cuda(settings::Settings, mcd::MPICartDomain,
     return fields
 end
 
-function iterate!(fields::Fields{T, N, CUDA.CuArray{T, N, CUDA.Mem.DeviceBuffer
-                                                    }}, settings::Settings,
+function iterate!(fields::Fields{T, N, AMDGPU.ROCArray{T, N}},
+                  settings::Settings,
                   mcd::MPICartDomain) where {T, N}
     _exchange!(fields, mcd)
     # this function is the bottleneck
@@ -66,11 +66,12 @@ function _populate!(u, v, offsets, sizes, minL, maxL)
     end
 
     # local coordinates (this are 1-index already)
-    lz = (CUDA.blockIdx().x - Int32(1)) * CUDA.blockDim().x +
-         CUDA.threadIdx().x
-    ly = (CUDA.blockIdx().y - Int32(1)) * CUDA.blockDim().y +
-         CUDA.threadIdx().y
+    lz = (AMDGPU.workgroupIdx().x - Int32(1)) * AMDGPU.workgroupDim().x +
+         AMDGPU.workitemIdx().x
+    ly = (AMDGPU.workgroupIdx().y - Int32(1)) * AMDGPU.workgroupDim().y +
+         AMDGPU.workitemIdx().y
 
+    # This check might not be needed
     if lz <= size(u, 3) && ly <= size(u, 2)
 
         # get global coordinates
@@ -94,18 +95,17 @@ function _populate!(u, v, offsets, sizes, minL, maxL)
     end
 end
 
-function _calculate!(fields::Fields{T, N,
-                                    CUDA.CuArray{T, N, CUDA.Mem.DeviceBuffer}},
+function _calculate!(fields::Fields{T, N, AMDGPU.ROCArray{T, N}},
                      settings::Settings,
                      mcd::MPICartDomain) where {T, N}
     function _calculte_kernel!(u, v, u_temp, v_temp, sizes, Du, Dv, F, K,
                                noise, dt)
 
         # local coordinates (this are 1-index already)
-        k = (CUDA.blockIdx().x - Int32(1)) * CUDA.blockDim().x +
-            CUDA.threadIdx().x
-        j = (CUDA.blockIdx().y - Int32(1)) * CUDA.blockDim().y +
-            CUDA.threadIdx().y
+        k = (AMDGPU.workgroupIdx().x - Int32(1)) * AMDGPU.workgroupDim().x +
+            AMDGPU.workitemIdx().x
+        j = (AMDGPU.workgroupIdx().y - Int32(1)) * AMDGPU.workgroupDim().y +
+            AMDGPU.workitemIdx().y
 
         # loop through non-ghost cells
         if k >= 2 && k <= sizes[3] + 1 && j >= 2 && j <= sizes[2] + 1
@@ -135,26 +135,26 @@ function _calculate!(fields::Fields{T, N,
     noise = convert(T, settings.noise)
     dt = convert(T, settings.dt)
 
-    cu_sizes = CUDA.CuArray(mcd.proc_sizes)
+    cu_sizes = AMDGPU.ROCArray(mcd.proc_sizes)
 
     threads = (16, 16)
     blocks = (settings.L, settings.L)
 
-    CUDA.@cuda threads=threads blocks=blocks _calculte_kernel!(fields.u,
-                                                               fields.v,
-                                                               fields.u_temp,
-                                                               fields.v_temp,
-                                                               cu_sizes,
-                                                               Du, Dv, F, K,
-                                                               noise, dt)
-    CUDA.synchronize()
+    AMDGPU.wait(AMDGPU.@roc groupsize=threads gridsize=grid _calculte_kernel!(fields.u,
+                                                                              fields.v,
+                                                                              fields.u_temp,
+                                                                              fields.v_temp,
+                                                                              cu_sizes,
+                                                                              Du,
+                                                                              Dv,
+                                                                              F,
+                                                                              K,
+                                                                              noise,
+                                                                              dt))
 end
 
 function get_fields(fields::Fields{T, N,
-                                   CUDA.CuArray{T, N, CUDA.Mem.DeviceBuffer}}) where {
-                                                                                      T,
-                                                                                      N
-                                                                                      }
+                                   AMDGPU.ROCArray{T, N}}) where {T, N}
     u = Array(fields.u)
     u_no_ghost = u[(begin + 1):(end - 1), (begin + 1):(end - 1),
                    (begin + 1):(end - 1)]

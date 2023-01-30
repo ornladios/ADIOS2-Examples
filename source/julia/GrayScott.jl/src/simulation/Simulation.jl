@@ -1,4 +1,7 @@
-
+""" 
+The present file contains runtime backend for using CPU Threads, and optionally 
+CUDA.jl and AMDGPU.jl
+"""
 module Simulation
 
 export init_domain, init_fields
@@ -9,8 +12,10 @@ import Distributions
 # from parent module
 import ..Settings, ..MPICartDomain, ..Fields
 
-# functions for NVIDIA GPUs using CUDA.jl
+# include functions for NVIDIA GPUs using CUDA.jl
 include("Simulation_CUDA.jl")
+# include functions for AMD GPUs using AMDGPU.jl
+# include("Simulation_AMDGPU.jl")
 
 function init_domain(settings::Settings, comm::MPI.Comm)::MPICartDomain
     mcd = MPICartDomain()
@@ -50,14 +55,19 @@ function init_domain(settings::Settings, comm::MPI.Comm)::MPICartDomain
     return mcd
 end
 
+"""
+Create and Initialize fields for either CPU, CUDA.jl, AMDGPU.jl backends
+Multiple dispatch would direct to the appropriate overleaded function
+"""
 function init_fields(settings::Settings,
                      mcd::MPICartDomain, T)::Fields{T}
     lowercase_backend = lowercase(settings.backend)
     if lowercase_backend == "cuda"
         return _init_fields_cuda(settings, mcd, T)
     elseif lowercase_backend == "amdgpu"
+        return _init_fields_amdgpu(settings, mcd, T)
     end
-
+    # everything else would trigger the CPU threads backend
     return _init_fields_cpu(settings, mcd, T)
 end
 
@@ -193,7 +203,12 @@ function _exchange!(fields, mcd)
         MPI.Sendrecv!(send_buf, recv_buf, comm, dest = rank2, source = rank1)
     end
 
-    for var in [fields.u, fields.v]
+    # if already a CPU array, no need to copy, 
+    # otherwise (device) copy to host. 
+    u = typeof(fields.u) <: Array ? fields.u : Array(fields.u)
+    v = typeof(fields.v) <: Array ? fields.v : Array(fields.v)
+
+    for var in [u, v]
         _exchange_xy!(var, mcd.proc_sizes[3], fields.xy_face_t,
                       mcd.proc_neighbors["north"], mcd.proc_neighbors["south"],
                       mcd.cart_comm)
@@ -220,7 +235,7 @@ function _calculate!(fields::Fields{T, N, Array{T, N}}, settings::Settings,
     # loop through non-ghost cells, bounds are inclusive
     Threads.@threads for k in 2:(mcd.proc_sizes[3] + 1)
         for j in 2:(mcd.proc_sizes[2] + 1)
-            for i in 2:(mcd.proc_sizes[1] + 1)
+            @inbounds for i in 2:(mcd.proc_sizes[1] + 1)
                 u = fields.u[i, j, k]
                 v = fields.v[i, j, k]
 
@@ -244,17 +259,19 @@ end
    7-point stencil around the cell
 """
 function _laplacian(i, j, k, var)
-    l = var[i - 1, j, k] + var[i + 1, j, k] + var[i, j - 1, k] +
-        var[i, j + 1, k] + var[i, j, k - 1] + var[i, j, k + 1] -
-        6.0 * var[i, j, k]
+    @inbounds l = var[i - 1, j, k] + var[i + 1, j, k] + var[i, j - 1, k] +
+                  var[i, j + 1, k] + var[i, j, k - 1] + var[i, j, k + 1] -
+                  6.0 * var[i, j, k]
     return l / 6.0
 end
 
 function get_fields(fields::Fields{T, N, Array{T, N}}) where {T, N}
-    u_no_ghost = fields.u[(begin + 1):(end - 1), (begin + 1):(end - 1),
-                          (begin + 1):(end - 1)]
-    v_no_ghost = fields.v[(begin + 1):(end - 1), (begin + 1):(end - 1),
-                          (begin + 1):(end - 1)]
+    @inbounds begin
+        u_no_ghost = fields.u[(begin + 1):(end - 1), (begin + 1):(end - 1),
+                              (begin + 1):(end - 1)]
+        v_no_ghost = fields.v[(begin + 1):(end - 1), (begin + 1):(end - 1),
+                              (begin + 1):(end - 1)]
+    end
     return u_no_ghost, v_no_ghost
 end
 
