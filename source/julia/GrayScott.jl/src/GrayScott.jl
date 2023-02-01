@@ -39,6 +39,7 @@ function julia_main()::Cint
 end
 
 function main(args::Vector{String})::Int32
+    MPI.Init()
     comm = MPI.COMM_WORLD
     rank = MPI.Comm_rank(comm)
     size = MPI.Comm_size(comm)
@@ -77,17 +78,14 @@ function main(args::Vector{String})::Int32
     end
 
     IO.close!(stream)
-    return 0
-end
 
-function __init__()
-    # - Initialize here instead of main so that the MPI context can be available
-    # for tests.
-    # - Conditional allows for case when external users (or tests) have already
-    # initialized an MPI context.
-    if !MPI.Initialized()
-        MPI.Init()
+    # Debugging session or Julia REPL session, not needed overall as it would be 
+    # called when the program ends
+    if !isinteractive()
+        MPI.Finalize()
     end
+
+    return 0
 end
 
 end # module GrayScott

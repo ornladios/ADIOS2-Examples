@@ -2,8 +2,7 @@
 import CUDA
 
 function _init_fields_cuda(settings::Settings, mcd::MPICartDomain,
-                           T)::Fields{T, 3,
-                                      CUDA.CuArray{T, 3, CUDA.Mem.DeviceBuffer}}
+                           T)::Fields{T, 3, <:CUDA.CuArray{T, 3}}
     size_x = mcd.proc_sizes[1]
     size_y = mcd.proc_sizes[2]
     size_z = mcd.proc_sizes[3]
@@ -26,10 +25,10 @@ function _init_fields_cuda(settings::Settings, mcd::MPICartDomain,
     threads = (16, 16)
     blocks = (settings.L, settings.L)
 
-    CUDA.@cuda threads=threads blocks=blocks _populate!(u, v,
-                                                        cu_offsets,
-                                                        cu_sizes,
-                                                        minL, maxL)
+    CUDA.@cuda threads=threads blocks=blocks _populate_cuda!(u, v,
+                                                             cu_offsets,
+                                                             cu_sizes,
+                                                             minL, maxL)
     CUDA.synchronize()
 
     xy_face_t, xz_face_t, yz_face_t = _get_mpi_faces(size_x, size_y, size_z, T)
@@ -38,8 +37,8 @@ function _init_fields_cuda(settings::Settings, mcd::MPICartDomain,
     return fields
 end
 
-function iterate!(fields::Fields{T, N, CUDA.CuArray{T, N, CUDA.Mem.DeviceBuffer
-                                                    }}, settings::Settings,
+function iterate!(fields::Fields{T, N, <:CUDA.CuArray{T, N}},
+                  settings::Settings,
                   mcd::MPICartDomain) where {T, N}
     _exchange!(fields, mcd)
     # this function is the bottleneck
@@ -50,7 +49,7 @@ function iterate!(fields::Fields{T, N, CUDA.CuArray{T, N, CUDA.Mem.DeviceBuffer
     fields.v, fields.v_temp = fields.v_temp, fields.v
 end
 
-function _populate!(u, v, offsets, sizes, minL, maxL)
+function _populate_cuda!(u, v, offsets, sizes, minL, maxL)
     function is_inside(x, y, z, offsets, sizes)::Bool
         if x < offsets[1] || x >= offsets[1] + sizes[1]
             return false
@@ -94,8 +93,7 @@ function _populate!(u, v, offsets, sizes, minL, maxL)
     end
 end
 
-function _calculate!(fields::Fields{T, N,
-                                    CUDA.CuArray{T, N, CUDA.Mem.DeviceBuffer}},
+function _calculate!(fields::Fields{T, N, <:CUDA.CuArray{T, N}},
                      settings::Settings,
                      mcd::MPICartDomain) where {T, N}
     function _calculte_kernel!(u, v, u_temp, v_temp, sizes, Du, Dv, F, K,
@@ -150,11 +148,7 @@ function _calculate!(fields::Fields{T, N,
     CUDA.synchronize()
 end
 
-function get_fields(fields::Fields{T, N,
-                                   CUDA.CuArray{T, N, CUDA.Mem.DeviceBuffer}}) where {
-                                                                                      T,
-                                                                                      N
-                                                                                      }
+function get_fields(fields::Fields{T, N, <:CUDA.CuArray{T, N}}) where {T, N}
     u = Array(fields.u)
     u_no_ghost = u[(begin + 1):(end - 1), (begin + 1):(end - 1),
                    (begin + 1):(end - 1)]

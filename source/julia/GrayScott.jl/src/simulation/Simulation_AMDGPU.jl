@@ -2,7 +2,7 @@
 import AMDGPU
 
 function _init_fields_amdgpu(settings::Settings, mcd::MPICartDomain,
-                             T)::Fields{T, 3, AMDGPU.ROCArray{T, 3}}
+                             T)::Fields{T, 3, <:AMDGPU.ROCArray{T, 3}}
     size_x = mcd.proc_sizes[1]
     size_y = mcd.proc_sizes[2]
     size_z = mcd.proc_sizes[3]
@@ -26,11 +26,12 @@ function _init_fields_amdgpu(settings::Settings, mcd::MPICartDomain,
     # grid size must be the total number of threads of each direction
     grid = (settings.L, settings.L)
 
-    AMDGPU.wait(AMDGPU.@roc groupsize=threads gridsize=grid _populate!(u, v,
-                                                                       roc_offsets,
-                                                                       roc_sizes,
-                                                                       minL,
-                                                                       maxL))
+    AMDGPU.wait(AMDGPU.@roc groupsize=threads gridsize=grid _populate_amdgpu!(u,
+                                                                              v,
+                                                                              roc_offsets,
+                                                                              roc_sizes,
+                                                                              minL,
+                                                                              maxL))
 
     xy_face_t, xz_face_t, yz_face_t = _get_mpi_faces(size_x, size_y, size_z, T)
 
@@ -38,7 +39,7 @@ function _init_fields_amdgpu(settings::Settings, mcd::MPICartDomain,
     return fields
 end
 
-function iterate!(fields::Fields{T, N, AMDGPU.ROCArray{T, N}},
+function iterate!(fields::Fields{T, N, <:AMDGPU.ROCArray{T, N}},
                   settings::Settings,
                   mcd::MPICartDomain) where {T, N}
     _exchange!(fields, mcd)
@@ -50,7 +51,7 @@ function iterate!(fields::Fields{T, N, AMDGPU.ROCArray{T, N}},
     fields.v, fields.v_temp = fields.v_temp, fields.v
 end
 
-function _populate!(u, v, offsets, sizes, minL, maxL)
+function _populate_amdgpu!(u, v, offsets, sizes, minL, maxL)
     function is_inside(x, y, z, offsets, sizes)::Bool
         if x < offsets[1] || x >= offsets[1] + sizes[1]
             return false
@@ -95,39 +96,9 @@ function _populate!(u, v, offsets, sizes, minL, maxL)
     end
 end
 
-function _calculate!(fields::Fields{T, N, AMDGPU.ROCArray{T, N}},
+function _calculate!(fields::Fields{T, N, <:AMDGPU.ROCArray{T, N}},
                      settings::Settings,
                      mcd::MPICartDomain) where {T, N}
-    function _calculte_kernel!(u, v, u_temp, v_temp, sizes, Du, Dv, F, K,
-                               noise, dt)
-
-        # local coordinates (this are 1-index already)
-        k = (AMDGPU.workgroupIdx().x - Int32(1)) * AMDGPU.workgroupDim().x +
-            AMDGPU.workitemIdx().x
-        j = (AMDGPU.workgroupIdx().y - Int32(1)) * AMDGPU.workgroupDim().y +
-            AMDGPU.workitemIdx().y
-
-        # loop through non-ghost cells
-        if k >= 2 && k <= sizes[3] + 1 && j >= 2 && j <= sizes[2] + 1
-            # bounds are inclusive
-            for i in 2:(sizes[1] + 1)
-                u_ijk = u[i, j, k]
-                v_ijk = v[i, j, k]
-
-                du = Du * _laplacian(i, j, k, u) - u_ijk * v_ijk^2 +
-                     F * (1.0 - u_ijk) +
-                     noise * rand(Distributions.Uniform(-1, 1))
-
-                dv = Dv * _laplacian(i, j, k, v) + u_ijk * v_ijk^2 -
-                     (F + K) * v_ijk
-
-                # advance the next step
-                u_temp[i, j, k] = u_ijk + du * dt
-                v_temp[i, j, k] = v_ijk + dv * dt
-            end
-        end
-    end
-
     Du = convert(T, settings.Du)
     Dv = convert(T, settings.Dv)
     F = convert(T, settings.F)
@@ -135,26 +106,55 @@ function _calculate!(fields::Fields{T, N, AMDGPU.ROCArray{T, N}},
     noise = convert(T, settings.noise)
     dt = convert(T, settings.dt)
 
-    cu_sizes = AMDGPU.ROCArray(mcd.proc_sizes)
+    roc_sizes = AMDGPU.ROCArray(mcd.proc_sizes)
 
     threads = (16, 16)
     blocks = (settings.L, settings.L)
 
-    AMDGPU.wait(AMDGPU.@roc groupsize=threads gridsize=grid _calculte_kernel!(fields.u,
-                                                                              fields.v,
-                                                                              fields.u_temp,
-                                                                              fields.v_temp,
-                                                                              cu_sizes,
-                                                                              Du,
-                                                                              Dv,
-                                                                              F,
-                                                                              K,
-                                                                              noise,
-                                                                              dt))
+    AMDGPU.wait(AMDGPU.@roc groupsize=threads gridsize=grid _calculte_kernel_amdgpu!(fields.u,
+                                                                                     fields.v,
+                                                                                     fields.u_temp,
+                                                                                     fields.v_temp,
+                                                                                     roc_sizes,
+                                                                                     Du,
+                                                                                     Dv,
+                                                                                     F,
+                                                                                     K,
+                                                                                     noise,
+                                                                                     dt))
 end
 
-function get_fields(fields::Fields{T, N,
-                                   AMDGPU.ROCArray{T, N}}) where {T, N}
+function _calculte_kernel_amdgpu!(u, v, u_temp, v_temp, sizes, Du, Dv, F, K,
+                                  noise, dt)
+
+    # local coordinates (this are 1-index already)
+    k = (AMDGPU.workgroupIdx().x - Int32(1)) * AMDGPU.workgroupDim().x +
+        AMDGPU.workitemIdx().x
+    j = (AMDGPU.workgroupIdx().y - Int32(1)) * AMDGPU.workgroupDim().y +
+        AMDGPU.workitemIdx().y
+
+    # loop through non-ghost cells
+    if k >= 2 && k <= sizes[3] + 1 && j >= 2 && j <= sizes[2] + 1
+        # bounds are inclusive
+        for i in 2:(sizes[1] + 1)
+            u_ijk = u[i, j, k]
+            v_ijk = v[i, j, k]
+
+            du = Du * _laplacian(i, j, k, u) - u_ijk * v_ijk^2 +
+                 F * (1.0 - u_ijk) +
+                 noise * rand(Distributions.Uniform(-1, 1))
+
+            dv = Dv * _laplacian(i, j, k, v) + u_ijk * v_ijk^2 -
+                 (F + K) * v_ijk
+
+            # advance the next step
+            u_temp[i, j, k] = u_ijk + du * dt
+            v_temp[i, j, k] = v_ijk + dv * dt
+        end
+    end
+end
+
+function get_fields(fields::Fields{T, N, <:AMDGPU.ROCArray{T, N}}) where {T, N}
     u = Array(fields.u)
     u_no_ghost = u[(begin + 1):(end - 1), (begin + 1):(end - 1),
                    (begin + 1):(end - 1)]

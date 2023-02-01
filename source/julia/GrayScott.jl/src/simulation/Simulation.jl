@@ -15,7 +15,7 @@ import ..Settings, ..MPICartDomain, ..Fields
 # include functions for NVIDIA GPUs using CUDA.jl
 include("Simulation_CUDA.jl")
 # include functions for AMD GPUs using AMDGPU.jl
-# include("Simulation_AMDGPU.jl")
+include("Simulation_AMDGPU.jl")
 
 function init_domain(settings::Settings, comm::MPI.Comm)::MPICartDomain
     mcd = MPICartDomain()
@@ -233,6 +233,8 @@ function _calculate!(fields::Fields{T, N, Array{T, N}}, settings::Settings,
     dt = convert(T, settings.dt)
 
     # loop through non-ghost cells, bounds are inclusive
+    # @TODO: load balancing? option: a big linear loop
+    # use @inbounds at the right for-loop level, avoid putting it at the top level
     Threads.@threads for k in 2:(mcd.proc_sizes[3] + 1)
         for j in 2:(mcd.proc_sizes[2] + 1)
             @inbounds for i in 2:(mcd.proc_sizes[1] + 1)
@@ -256,7 +258,8 @@ function _calculate!(fields::Fields{T, N, Array{T, N}}, settings::Settings,
 end
 
 """
-   7-point stencil around the cell
+   7-point stencil around the cell, 
+   this is equally a host and a device function!
 """
 function _laplacian(i, j, k, var)
     @inbounds l = var[i - 1, j, k] + var[i + 1, j, k] + var[i, j - 1, k] +
