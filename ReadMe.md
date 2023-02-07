@@ -20,7 +20,9 @@ source/cpp:  C++ low-level and high-level API examples
     - [variables-shapes-hl.cpp](https://github.com/ornladios/ADIOS2-Examples/blob/master/source/cpp/basics/variables-shapes-hl.cpp) variables shapes support in adios2 C++ high-level API
 
 
-- [gray-scott](https://github.com/ornladios/ADIOS2-Examples/blob/master/source/cpp/gray-scott/): 3D reaction diffusion simulation in C++, includes C++ and Python analisys code. 
+- [gray-scott](https://github.com/ornladios/ADIOS2-Examples/blob/master/source/cpp/gray-scott/): 3D reaction diffusion simulation in C++, includes C++ and Python analisys code.
+
+- [GrayScott.jl](https://github.com/ornladios/ADIOS2-Examples/blob/master/source/julia/GrayScott.jl): 3D reaction diffusion simulation in Julia with either CPU threads, CUDA.jl or AMDGPU.jl (AMD GPU random number generation is work-in-progress) back ends and analisys code (also work in progress). Uses [ADIOS2.jl](https://github.com/eschnett/ADIOS2.jl) Julia bindings.
 
 source/c: C API examples
 - hello-world: write and reads a simple greeting

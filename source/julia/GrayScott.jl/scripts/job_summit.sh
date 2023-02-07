@@ -14,3 +14,5 @@ GS_DIR=/gpfs/alpine/proj-shared/csc383/wgodoy/ADIOS2-Examples/source/julia/GrayS
 GS_EXE=$GS_DIR/gray-scott.jl
 
 jsrun -n 1 -g 1 julia --project=$GS_DIR $GS_EXE settings-files.json
+
+# launch this file with bsub `$ bsub job_summit.sh`

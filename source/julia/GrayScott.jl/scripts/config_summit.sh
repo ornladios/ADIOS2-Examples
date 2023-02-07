@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# Replace these 3 entries
 PROJ_DIR=/gpfs/alpine/proj-shared/csc383
 export JULIA_DEPOT_PATH=$PROJ_DIR/etc/summit/julia_depot
 GS_DIR=$PROJ_DIR/wgodoy/ADIOS2-Examples/source/julia/GrayScott.jl

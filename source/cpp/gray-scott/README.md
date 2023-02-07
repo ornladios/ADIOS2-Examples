@@ -4,7 +4,7 @@ This is a 3D 7-point stencil code to simulate the following [Gray-Scott
 reaction diffusion model](https://doi.org/10.1126/science.261.5118.189):
 
 ```
-u_t = Du * (u_xx + u_yy + u_zz) - u * v^2 + F * (1 - u)
+u_t = Du * (u_xx + u_yy + u_zz) - u * v^2 + F * (1 - u)  + noise * randn(-1,1)
 v_t = Dv * (v_xx + v_yy + v_zz) + u * v^2 - (F + k) * v
 ```
 
