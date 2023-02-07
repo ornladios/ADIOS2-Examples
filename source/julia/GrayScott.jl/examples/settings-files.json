@@ -1,14 +1,14 @@
 {
-    "L": 512,
+    "L": 64,
     "Du": 0.2,
     "Dv": 0.1,
     "F": 0.02,
     "k": 0.048,
     "dt": 1.0,
-    "plotgap": 200,
+    "plotgap": 10,
     "steps": 10000,
     "noise": 0.1,
-    "output": "gs-julia-1MPI-512L.bp",
+    "output": "gs-julia-1MPI-64L-F32.bp",
     "checkpoint": false,
     "checkpoint_freq": 700,
     "checkpoint_output": "ckpt.bp",
@@ -19,5 +19,5 @@
     "adios_memory_selection": false,
     "mesh_type": "image",
     "precision": "Float32",
-    "backend": "CUDA"
+    "backend": "CPU"
 }
