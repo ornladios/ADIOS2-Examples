@@ -39,8 +39,13 @@ std::string reader()
     adios2::fstream in("hello-world-hl-cpp.bp", adios2::fstream::in);
 #endif
 
-    const std::vector<std::string> greetings = in.read<std::string>("Greeting");
-    return greetings.front();
+    for (adios2::fstep iStep; adios2::getstep(in, iStep);)
+    {
+        const std::vector<std::string> greetings =
+            in.read<std::string>("Greeting");
+        return greetings.front();
+    }
+    return "";
 }
 
 int main(int argc, char *argv[])

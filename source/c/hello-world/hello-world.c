@@ -32,11 +32,14 @@ void writer(adios2_adios *adios, const char *greeting)
 
 void reader(adios2_adios *adios, char *greeting)
 {
+    adios2_step_status status;
     adios2_io *io = adios2_declare_io(adios, "hello-world-reader");
     adios2_engine *engine =
         adios2_open(io, "hello-world-c.bp", adios2_mode_read);
     adios2_variable *var_greeting = adios2_inquire_variable(io, "Greeting");
+    adios2_begin_step(engine, adios2_step_mode_read, -1., &status);
     adios2_get(engine, var_greeting, greeting, adios2_mode_deferred);
+    adios2_end_step(engine);
     adios2_close(engine);
 }
 

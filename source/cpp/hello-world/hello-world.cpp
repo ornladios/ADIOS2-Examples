@@ -32,10 +32,12 @@ std::string reader(adios2::ADIOS &adios)
 {
     adios2::IO io = adios.DeclareIO("hello-world-reader");
     adios2::Engine reader = io.Open("hello-world-cpp.bp", adios2::Mode::Read);
+    reader.BeginStep();
     adios2::Variable<std::string> varGreeting =
         io.InquireVariable<std::string>("Greeting");
     std::string greeting;
     reader.Get(varGreeting, greeting);
+    reader.EndStep();
     reader.Close();
     return greeting;
 }
