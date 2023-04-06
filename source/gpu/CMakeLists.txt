@@ -3,10 +3,19 @@
 # accompanying file Copyright.txt for details.
 #------------------------------------------------------------------------------#
 
-add_subdirectory(c)
-add_subdirectory(cpp)
-add_subdirectory(gpu)
+set(common_deps adios2::cxx11)
 
-if(CMAKE_Fortran_COMPILER_LOADED)
-  add_subdirectory(fortran)
+find_package(CUDAToolkit QUIET)
+if(CUDAToolkit_FOUND)
+    add_subdirectory(basics-cuda)
+endif()
+
+find_package(hip QUIET)
+if(hip_FOUND)
+    add_subdirectory(basics-hip)
+endif()
+
+find_package(Kokkos QUIET)
+if(Kokkos_FOUND)
+    add_subdirectory(basics-kokkos)
 endif()

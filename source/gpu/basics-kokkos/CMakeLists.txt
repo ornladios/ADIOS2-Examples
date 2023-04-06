@@ -3,10 +3,9 @@
 # accompanying file Copyright.txt for details.
 #------------------------------------------------------------------------------#
 
-add_subdirectory(c)
-add_subdirectory(cpp)
-add_subdirectory(gpu)
-
-if(CMAKE_Fortran_COMPILER_LOADED)
-  add_subdirectory(fortran)
-endif()
+add_executable(adios2-write-read-kokkos write-read-kokkos.cpp)
+target_link_libraries(adios2-write-read-kokkos ${common_deps} Kokkos::kokkos)
+add_test_helper(adios2-write-read-kokkos)
+install(TARGETS adios2-write-read-kokkos
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
