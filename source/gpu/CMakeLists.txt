@@ -14,3 +14,8 @@ find_package(hip QUIET)
 if(hip_FOUND)
     add_subdirectory(basics-hip)
 endif()
+
+find_package(Kokkos QUIET)
+if(Kokkos_FOUND)
+    add_subdirectory(basics-kokkos)
+endif()
