@@ -9,3 +9,8 @@ find_package(CUDAToolkit QUIET)
 if(CUDAToolkit_FOUND)
     add_subdirectory(basics-cuda)
 endif()
+
+find_package(hip QUIET)
+if(hip_FOUND)
+    add_subdirectory(basics-hip)
+endif()
