@@ -96,8 +96,8 @@ end
 function _calculate!(fields::Fields{T, N, <:CUDA.CuArray{T, N}},
                      settings::Settings,
                      mcd::MPICartDomain) where {T, N}
-    function _calculte_kernel!(u, v, u_temp, v_temp, sizes, Du, Dv, F, K,
-                               noise, dt)
+    function _calculate_kernel!(u, v, u_temp, v_temp, sizes, Du, Dv, F, K,
+                                noise, dt)
 
         # local coordinates (this are 1-index already)
         k = (CUDA.blockIdx().x - Int32(1)) * CUDA.blockDim().x +
@@ -138,13 +138,13 @@ function _calculate!(fields::Fields{T, N, <:CUDA.CuArray{T, N}},
     threads = (16, 16)
     blocks = (settings.L, settings.L)
 
-    CUDA.@cuda threads=threads blocks=blocks _calculte_kernel!(fields.u,
-                                                               fields.v,
-                                                               fields.u_temp,
-                                                               fields.v_temp,
-                                                               cu_sizes,
-                                                               Du, Dv, F, K,
-                                                               noise, dt)
+    CUDA.@cuda threads=threads blocks=blocks _calculate_kernel!(fields.u,
+                                                                fields.v,
+                                                                fields.u_temp,
+                                                                fields.v_temp,
+                                                                cu_sizes,
+                                                                Du, Dv, F, K,
+                                                                noise, dt)
     CUDA.synchronize()
 end
 

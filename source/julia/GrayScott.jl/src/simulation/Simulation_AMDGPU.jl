@@ -111,21 +111,21 @@ function _calculate!(fields::Fields{T, N, <:AMDGPU.ROCArray{T, N}},
     threads = (16, 16)
     blocks = (settings.L, settings.L)
 
-    AMDGPU.wait(AMDGPU.@roc groupsize=threads gridsize=grid _calculte_kernel_amdgpu!(fields.u,
-                                                                                     fields.v,
-                                                                                     fields.u_temp,
-                                                                                     fields.v_temp,
-                                                                                     roc_sizes,
-                                                                                     Du,
-                                                                                     Dv,
-                                                                                     F,
-                                                                                     K,
-                                                                                     noise,
-                                                                                     dt))
+    AMDGPU.wait(AMDGPU.@roc groupsize=threads gridsize=grid _calculate_kernel_amdgpu!(fields.u,
+                                                                                      fields.v,
+                                                                                      fields.u_temp,
+                                                                                      fields.v_temp,
+                                                                                      roc_sizes,
+                                                                                      Du,
+                                                                                      Dv,
+                                                                                      F,
+                                                                                      K,
+                                                                                      noise,
+                                                                                      dt))
 end
 
-function _calculte_kernel_amdgpu!(u, v, u_temp, v_temp, sizes, Du, Dv, F, K,
-                                  noise, dt)
+function _calculate_kernel_amdgpu!(u, v, u_temp, v_temp, sizes, Du, Dv, F, K,
+                                   noise, dt)
 
     # local coordinates (this are 1-index already)
     k = (AMDGPU.workgroupIdx().x - Int32(1)) * AMDGPU.workgroupDim().x +
