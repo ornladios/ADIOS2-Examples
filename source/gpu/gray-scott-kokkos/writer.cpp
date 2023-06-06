@@ -111,8 +111,8 @@ void Writer::write(int step, const GrayScott &sim)
 
     if (settings.adios_memory_selection)
     {
-        const Kokkos::View<double *> &u = sim.u_ghost();
-        const Kokkos::View<double *> &v = sim.v_ghost();
+        const Kokkos::View<double *> u = sim.u_ghost();
+        const Kokkos::View<double *> v = sim.v_ghost();
 
         writer.BeginStep();
         writer.Put<int>(var_step, &step);
@@ -122,24 +122,12 @@ void Writer::write(int step, const GrayScott &sim)
     }
     else if (settings.adios_span)
     {
-        writer.BeginStep();
-
-        writer.Put<int>(var_step, &step);
-
-        // provide memory directly from adios buffer
-        adios2::Variable<double>::Span u_span = writer.Put<double>(var_u);
-        adios2::Variable<double>::Span v_span = writer.Put<double>(var_v);
-
-        // populate spans
-        sim.u_noghost(u_span.data());
-        sim.v_noghost(v_span.data());
-
-        writer.EndStep();
+		std::cout << "ADIOS2 Span with Kokkos currently not supported" << std::endl;
     }
     else
     {
-        std::vector<double> u = sim.u_noghost();
-        std::vector<double> v = sim.v_noghost();
+        Kokkos::View<double *> u = sim.u_noghost();
+        Kokkos::View<double *> v = sim.v_noghost();
 
         writer.BeginStep();
         writer.Put<int>(var_step, &step);

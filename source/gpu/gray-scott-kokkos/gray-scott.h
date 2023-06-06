@@ -28,14 +28,14 @@ public:
     void iterate();
     void restart(Kokkos::View<double *> &u, Kokkos::View<double *> &v);
 
-    const Kokkos::View<double *> &u_ghost() const;
-    const Kokkos::View<double *> &v_ghost() const;
+    const Kokkos::View<double *> u_ghost() const;
+    const Kokkos::View<double *> v_ghost() const;
 
-    std::vector<double> u_noghost() const;
-    std::vector<double> v_noghost() const;
+    Kokkos::View<double *> u_noghost() const;
+    Kokkos::View<double *> v_noghost() const;
 
-    void u_noghost(double *u_no_ghost) const;
-    void v_noghost(double *v_no_ghost) const;
+    void u_noghost(Kokkos::View<double *> u_no_ghost) const;
+    void v_noghost(Kokkos::View<double *> v_no_ghost) const;
 
     Settings settings;
 
@@ -81,13 +81,13 @@ public:
     void exchange_yz(std::vector<double> &local_data) const;
 
     // Return a copy of data with ghosts removed
-    std::vector<double> data_noghost(const Kokkos::View<double *> &data) const;
+    Kokkos::View<double *> data_noghost(const Kokkos::View<double *> &data) const;
 
     // pointer version
-    void data_noghost(const Kokkos::View<double *> &data, double *no_ghost) const;
+    void data_noghost(const Kokkos::View<double *> &data, Kokkos::View<double *> no_ghost) const;
 
     // Check if point is included in my subdomain
-    inline bool is_inside(int x, int y, int z) const
+    KOKKOS_FUNCTION bool is_inside(int x, int y, int z) const
     {
         if (x < offset_x)
             return false;
@@ -120,7 +120,7 @@ public:
     }
 
     void data_no_ghost_common(const Kokkos::View<double *> &data,
-                              double *data_no_ghost) const;
+                              Kokkos::View <double *> data_no_ghost) const;
 };
 
 #endif
