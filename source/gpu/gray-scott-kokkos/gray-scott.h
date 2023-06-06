@@ -26,21 +26,21 @@ public:
 
     void init();
     void iterate();
-    void restart(Kokkos::View<double *> &u, Kokkos::View<double *> &v);
+    void restart(Kokkos::View<double ***> &u, Kokkos::View<double ***> &v);
 
-    const Kokkos::View<double *> u_ghost() const;
-    const Kokkos::View<double *> v_ghost() const;
+    const Kokkos::View<double ***> u_ghost() const;
+    const Kokkos::View<double ***> v_ghost() const;
 
-    Kokkos::View<double *> u_noghost() const;
-    Kokkos::View<double *> v_noghost() const;
+    Kokkos::View<double ***> u_noghost() const;
+    Kokkos::View<double ***> v_noghost() const;
 
-    void u_noghost(Kokkos::View<double *> u_no_ghost) const;
-    void v_noghost(Kokkos::View<double *> v_no_ghost) const;
+    void u_noghost(Kokkos::View<double ***> u_no_ghost) const;
+    void v_noghost(Kokkos::View<double ***> v_no_ghost) const;
 
     Settings settings;
 
     using mem_space = Kokkos::DefaultExecutionSpace::memory_space;
-    Kokkos::View<double *, mem_space> u, v, u2, v2;
+    Kokkos::View<double ***, mem_space> u, v, u2, v2;
 
     int rank, procs;
     int west, east, up, down, north, south;
@@ -63,13 +63,6 @@ public:
 
     // Progess simulation for one timestep
     void calc();
-    // Compute reaction term for U
-    KOKKOS_FUNCTION double calcU(double tu, double tv) const;
-    // Compute reaction term for V
-    KOKKOS_FUNCTION double calcV(double tu, double tv) const;
-    // Compute laplacian of field s at (ix, iy, iz)
-    KOKKOS_FUNCTION double laplacian(int ix, int iy, int iz,
-                                     const Kokkos::View<double *> &s) const;
 
     // Exchange faces with neighbors
     void exchange(std::vector<double> &u, std::vector<double> &v) const;
@@ -81,46 +74,19 @@ public:
     void exchange_yz(std::vector<double> &local_data) const;
 
     // Return a copy of data with ghosts removed
-    Kokkos::View<double *> data_noghost(const Kokkos::View<double *> &data) const;
+    Kokkos::View<double ***> data_noghost(const Kokkos::View<double ***> &data) const;
 
     // pointer version
-    void data_noghost(const Kokkos::View<double *> &data, Kokkos::View<double *> no_ghost) const;
+    void data_noghost(const Kokkos::View<double ***> &data, Kokkos::View<double ***> no_ghost) const;
 
-    // Check if point is included in my subdomain
-    KOKKOS_FUNCTION bool is_inside(int x, int y, int z) const
-    {
-        if (x < offset_x)
-            return false;
-        if (x >= offset_x + size_x)
-            return false;
-        if (y < offset_y)
-            return false;
-        if (y >= offset_y + size_y)
-            return false;
-        if (z < offset_z)
-            return false;
-        if (z >= offset_z + size_z)
-            return false;
-
-        return true;
-    }
-    // Convert global coordinate to local index
-    KOKKOS_FUNCTION int g2i(int gx, int gy, int gz) const
-    {
-        int x = gx - offset_x;
-        int y = gy - offset_y;
-        int z = gz - offset_z;
-
-        return l2i(x + 1, y + 1, z + 1);
-    }
     // Convert local coordinate to local index
     KOKKOS_FUNCTION int l2i(int x, int y, int z) const
     {
         return x + y * (size_x + 2) + z * (size_x + 2) * (size_y + 2);
     }
 
-    void data_no_ghost_common(const Kokkos::View<double *> &data,
-                              Kokkos::View <double *> data_no_ghost) const;
+    void data_no_ghost_common(const Kokkos::View<double ***> &data,
+                              Kokkos::View <double ***> data_no_ghost) const;
 };
 
 #endif
