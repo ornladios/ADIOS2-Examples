@@ -66,8 +66,10 @@ Writer::Writer(const Settings &settings, const GrayScott &sim, adios2::IO io)
 
     std::vector<std::string> varList = {"U", "V"};
     std::vector<std::string> assocList = {"points", "points"};
-    io.DefineAttribute<std::string>("Fides_Variable_List", varList.data(), varList.size());
-    io.DefineAttribute<std::string>("Fides_Variable_Associations", assocList.data(), assocList.size());
+    io.DefineAttribute<std::string>("Fides_Variable_List", varList.data(),
+                                    varList.size());
+    io.DefineAttribute<std::string>("Fides_Variable_Associations",
+                                    assocList.data(), assocList.size());
 
     var_u =
         io.DefineVariable<double>("U", {settings.L, settings.L, settings.L},
@@ -122,7 +124,8 @@ void Writer::write(int step, const GrayScott &sim)
     }
     else if (settings.adios_span)
     {
-		std::cout << "ADIOS2 Span with Kokkos currently not supported" << std::endl;
+        std::cout << "ADIOS2 Span with Kokkos currently not supported"
+                  << std::endl;
     }
     else
     {

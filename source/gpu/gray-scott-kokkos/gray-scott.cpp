@@ -39,7 +39,8 @@ void GrayScott::iterate()
     std::swap(v, v2);
 }
 
-void GrayScott::restart(Kokkos::View<double ***> &u_in, Kokkos::View<double ***> &v_in)
+void GrayScott::restart(Kokkos::View<double ***> &u_in,
+                        Kokkos::View<double ***> &v_in)
 {
     auto const expected_len = (size_x + 2) * (size_y + 2) * (size_z + 2);
     if (u_in.size() == expected_len)
@@ -107,93 +108,92 @@ void GrayScott::init_field()
 
     const int d = 6;
     auto const L = settings.L;
-	auto const temp_u = u;
-	auto const temp_v = v;
-	size_t const ox = offset_x, oy = offset_y, oz = offset_z;
-	size_t const sx = size_x, sy = size_y, sz = size_z;
+    auto const temp_u = u;
+    auto const temp_v = v;
+    size_t const ox = offset_x, oy = offset_y, oz = offset_z;
+    size_t const sx = size_x, sy = size_y, sz = size_z;
     Kokkos::parallel_for(
-            "init_buffers",
-            Kokkos::RangePolicy<>(L / 2 - d, L / 2 + d),
-            KOKKOS_LAMBDA(int z)
-    {
-        for (int y = L / 2 - d; y < L / 2 + d; y++)
-        {
-            for (int x = L / 2 - d; x < L / 2 + d; x++)
+        "init_buffers", Kokkos::RangePolicy<>(L / 2 - d, L / 2 + d),
+        KOKKOS_LAMBDA(int z) {
+            for (int y = L / 2 - d; y < L / 2 + d; y++)
             {
-				if (x < ox)
-                    continue;
-				if (x >= ox + sx)
-                    continue;
-				if (y < oy)
-                    continue;
-				if (y >= oy + sy)
-                    continue;
-				if (z < oz)
-                    continue;
-				if (z >= oz + sz)
-                    continue;
-                temp_u(x - ox + 1, y - oy + 1, z - oz + 1) = 0.25;
-                temp_v(x - ox + 1, y - oy + 1, z - oz + 1) = 0.33;
+                for (int x = L / 2 - d; x < L / 2 + d; x++)
+                {
+                    if (x < ox)
+                        continue;
+                    if (x >= ox + sx)
+                        continue;
+                    if (y < oy)
+                        continue;
+                    if (y >= oy + sy)
+                        continue;
+                    if (z < oz)
+                        continue;
+                    if (z >= oz + sz)
+                        continue;
+                    temp_u(x - ox + 1, y - oy + 1, z - oz + 1) = 0.25;
+                    temp_v(x - ox + 1, y - oy + 1, z - oz + 1) = 0.33;
+                }
             }
-        }
-    });
+        });
 }
 
 void GrayScott::calc()
 {
-	auto const temp_u = u;
-	auto const temp_v = v;
-	auto const temp_u2 = u2;
-	auto const temp_v2 = v2;
-	auto const Du = settings.Du;
-	auto const Dv = settings.Dv;
-	auto const dt = settings.dt;
-	auto const F = settings.F;
-	auto const k = settings.k;
-	size_t const sx = size_x, sy = size_y, sz = size_z;
+    auto const temp_u = u;
+    auto const temp_v = v;
+    auto const temp_u2 = u2;
+    auto const temp_v2 = v2;
+    auto const Du = settings.Du;
+    auto const Dv = settings.Dv;
+    auto const dt = settings.dt;
+    auto const F = settings.F;
+    auto const k = settings.k;
+    size_t const sx = size_x, sy = size_y, sz = size_z;
     Kokkos::parallel_for(
-            "calc_gray_scott",
-            Kokkos::RangePolicy<>(1, sz + 1),
-            KOKKOS_LAMBDA(int z)
-    {
-		double ts;
-        for (int y = 1; y < sy + 1; y++)
-        {
-            for (int x = 1; x < sx + 1; x++)
+        "calc_gray_scott", Kokkos::RangePolicy<>(1, sz + 1),
+        KOKKOS_LAMBDA(int z) {
+            double ts;
+            for (int y = 1; y < sy + 1; y++)
             {
-                double du, dv;
-				// laplacian for u
-				ts = 0;
-				ts += temp_u(x - 1, y, z);
-				ts += temp_u(x + 1, y, z);
-				ts += temp_u(x, y - 1, z);
-				ts += temp_u(x, y + 1, z);
-				ts += temp_u(x, y, z - 1);
-				ts += temp_u(x, y, z + 1);
-				ts += -6.0 * temp_u(x, y, z);
-				ts /= 6.0;
-                du = Du * ts;
+                for (int x = 1; x < sx + 1; x++)
+                {
+                    double du, dv;
+                    // laplacian for u
+                    ts = 0;
+                    ts += temp_u(x - 1, y, z);
+                    ts += temp_u(x + 1, y, z);
+                    ts += temp_u(x, y - 1, z);
+                    ts += temp_u(x, y + 1, z);
+                    ts += temp_u(x, y, z - 1);
+                    ts += temp_u(x, y, z + 1);
+                    ts += -6.0 * temp_u(x, y, z);
+                    ts /= 6.0;
+                    du = Du * ts;
 
-				// laplacian for v
-				ts = 0;
-				ts += temp_v(x - 1, y, z);
-				ts += temp_v(x + 1, y, z);
-				ts += temp_v(x, y - 1, z);
-				ts += temp_v(x, y + 1, z);
-				ts += temp_v(x, y, z - 1);
-				ts += temp_v(x, y, z + 1);
-				ts += -6.0 * temp_v(x, y, z);
-				ts /= 6.0;
-                dv = Dv * ts;
+                    // laplacian for v
+                    ts = 0;
+                    ts += temp_v(x - 1, y, z);
+                    ts += temp_v(x + 1, y, z);
+                    ts += temp_v(x, y - 1, z);
+                    ts += temp_v(x, y + 1, z);
+                    ts += temp_v(x, y, z - 1);
+                    ts += temp_v(x, y, z + 1);
+                    ts += -6.0 * temp_v(x, y, z);
+                    ts /= 6.0;
+                    dv = Dv * ts;
 
-                du += (-temp_u(x,y,z) * temp_v(x,y,z) * temp_v(x,y,z) + F * (1.0 - temp_u(x,y,z)));
-                dv += (temp_u(x, y,z) * temp_v(x, y,z) * temp_v(x, y,z) - (F + k) * temp_v(x, y,z));
-                //du += settings.noise * uniform_dist(mt_gen);
-                temp_u2(x, y, z) = temp_u(x, y, z) + du * dt;
-                temp_v2(x, y, z) = temp_v(x, y, z) + dv * dt;
+                    du +=
+                        (-temp_u(x, y, z) * temp_v(x, y, z) * temp_v(x, y, z) +
+                         F * (1.0 - temp_u(x, y, z)));
+                    dv += (temp_u(x, y, z) * temp_v(x, y, z) * temp_v(x, y, z) -
+                           (F + k) * temp_v(x, y, z));
+                    // du += settings.noise * uniform_dist(mt_gen);
+                    temp_u2(x, y, z) = temp_u(x, y, z) + du * dt;
+                    temp_v2(x, y, z) = temp_v(x, y, z) + dv * dt;
+                }
             }
-        }
-    });
+        });
 }
 
 void GrayScott::init_mpi()
@@ -309,23 +309,21 @@ void GrayScott::exchange(std::vector<double> &u, std::vector<double> &v) const
     exchange_yz(v);
 }
 
-void GrayScott::data_no_ghost_common(const Kokkos::View<double ***> &data,
-                                     Kokkos::View<double ***> data_no_ghost) const
+void GrayScott::data_no_ghost_common(
+    const Kokkos::View<double ***> &data,
+    Kokkos::View<double ***> data_no_ghost) const
 {
-	auto const sx = size_x;
-	auto const sy = size_y;
-	auto const sz = size_z;
+    auto const sx = size_x;
+    auto const sy = size_y;
+    auto const sz = size_z;
     Kokkos::parallel_for(
-            "updateBuffer",
-            Kokkos::RangePolicy<>(1, sz + 1),
-            KOKKOS_LAMBDA(int z)
-    {
-        for (int y = 1; y < sy + 1; y++)
-        {
-            for (int x = 1; x < sx + 1; x++)
+        "updateBuffer", Kokkos::RangePolicy<>(1, sz + 1), KOKKOS_LAMBDA(int z) {
+            for (int y = 1; y < sy + 1; y++)
             {
-                data_no_ghost(x - 1, y - 1, z - 1) = data(x, y, z);
+                for (int x = 1; x < sx + 1; x++)
+                {
+                    data_no_ghost(x - 1, y - 1, z - 1) = data(x, y, z);
+                }
             }
-        }
-    });
+        });
 }

@@ -8,9 +8,9 @@
 
 #include <Kokkos_Core.hpp>
 
-#include "timer.hpp"
 #include "gray-scott.h"
 #include "restart.h"
+#include "timer.hpp"
 #include "writer.h"
 
 void print_io_settings(const adios2::IO &io)
@@ -98,8 +98,9 @@ int main(int argc, char **argv)
         if (settings.restart)
         {
             restart_step = ReadRestart(comm, settings, sim, io_ckpt);
-            io_main.SetParameter("AppendAfterSteps",
-                                 std::to_string(restart_step / settings.plotgap));
+            io_main.SetParameter(
+                "AppendAfterSteps",
+                std::to_string(restart_step / settings.plotgap));
         }
 
         Writer writer_main(settings, sim, io_main);
@@ -108,10 +109,12 @@ int main(int argc, char **argv)
         if (rank == 0)
         {
             print_io_settings(io_main);
-            std::cout << "========================================" << std::endl;
+            std::cout << "========================================"
+                      << std::endl;
             print_settings(settings, restart_step);
             print_simulator_settings(sim);
-            std::cout << "========================================" << std::endl;
+            std::cout << "========================================"
+                      << std::endl;
         }
 
 #ifdef ENABLE_TIMERS

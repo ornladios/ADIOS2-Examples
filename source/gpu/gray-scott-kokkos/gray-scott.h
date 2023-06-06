@@ -4,8 +4,8 @@
 #include <random>
 #include <vector>
 
-#include <mpi.h>
 #include <Kokkos_Core.hpp>
+#include <mpi.h>
 
 #include "settings.h"
 
@@ -74,10 +74,12 @@ public:
     void exchange_yz(std::vector<double> &local_data) const;
 
     // Return a copy of data with ghosts removed
-    Kokkos::View<double ***> data_noghost(const Kokkos::View<double ***> &data) const;
+    Kokkos::View<double ***>
+    data_noghost(const Kokkos::View<double ***> &data) const;
 
     // pointer version
-    void data_noghost(const Kokkos::View<double ***> &data, Kokkos::View<double ***> no_ghost) const;
+    void data_noghost(const Kokkos::View<double ***> &data,
+                      Kokkos::View<double ***> no_ghost) const;
 
     // Convert local coordinate to local index
     KOKKOS_FUNCTION int l2i(int x, int y, int z) const
@@ -86,7 +88,7 @@ public:
     }
 
     void data_no_ghost_common(const Kokkos::View<double ***> &data,
-                              Kokkos::View <double ***> data_no_ghost) const;
+                              Kokkos::View<double ***> data_no_ghost) const;
 };
 
 #endif
