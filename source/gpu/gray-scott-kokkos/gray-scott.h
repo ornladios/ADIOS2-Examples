@@ -37,7 +37,6 @@ public:
     void u_noghost(double *u_no_ghost) const;
     void v_noghost(double *v_no_ghost) const;
 
-protected:
     Settings settings;
 
     using mem_space = Kokkos::DefaultExecutionSpace::memory_space;
@@ -120,7 +119,6 @@ protected:
         return x + y * (size_x + 2) + z * (size_x + 2) * (size_y + 2);
     }
 
-private:
     void data_no_ghost_common(const Kokkos::View<double *> &data,
                               double *data_no_ghost) const;
 };

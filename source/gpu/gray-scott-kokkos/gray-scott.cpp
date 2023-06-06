@@ -41,7 +41,7 @@ void GrayScott::iterate()
 
 void GrayScott::restart(Kokkos::View<double *> &u_in, Kokkos::View<double *> &v_in)
 {
-    auto expected_len = (size_x + 2) * (size_y + 2) * (size_z + 2);
+    auto const expected_len = (size_x + 2) * (size_y + 2) * (size_z + 2);
     if (u_in.size() == expected_len)
     {
         u = u_in;
@@ -56,40 +56,40 @@ void GrayScott::restart(Kokkos::View<double *> &u_in, Kokkos::View<double *> &v_
     }
 }
 
-const Kokkos::View<double *> &GrayScott::u_ghost() const { return u; }
+const Kokkos::View<double *> GrayScott::u_ghost() const { return u; }
 
-const Kokkos::View<double *> &GrayScott::v_ghost() const { return v; }
+const Kokkos::View<double *> GrayScott::v_ghost() const { return v; }
 
-std::vector<double> GrayScott::u_noghost() const
+Kokkos::View<double *> GrayScott::u_noghost() const
 {
     return data_noghost(u);
 }
 
-std::vector<double> GrayScott::v_noghost() const
+Kokkos::View<double *> GrayScott::v_noghost() const
 {
     return data_noghost(v);
 }
 
-void GrayScott::u_noghost(double *u_no_ghost) const
+void GrayScott::u_noghost(Kokkos::View<double *> u_no_ghost) const
 {
     data_noghost(u, u_no_ghost);
 }
 
-void GrayScott::v_noghost(double *v_no_ghost) const
+void GrayScott::v_noghost(Kokkos::View<double *> v_no_ghost) const
 {
     data_noghost(v, v_no_ghost);
 }
 
-std::vector<double>
+Kokkos::View<double *>
 GrayScott::data_noghost(const Kokkos::View<double *> &data) const
 {
-    std::vector<double> buf(size_x * size_y * size_z);
-    data_no_ghost_common(data, buf.data());
+    Kokkos::View<double *> buf("noghost_temp", size_x * size_y * size_z);
+    data_no_ghost_common(data, buf);
     return buf;
 }
 
 void GrayScott::data_noghost(const Kokkos::View<double *> &data,
-                             double *data_no_ghost) const
+                             Kokkos::View<double *> data_no_ghost) const
 {
     data_no_ghost_common(data, data_no_ghost);
 }
@@ -107,14 +107,15 @@ void GrayScott::init_field()
     Kokkos::deep_copy(v2, 0.0);
 
     const int d = 6;
+    auto const L = settings.L;
     Kokkos::parallel_for(
             "init_buffers",
-            Kokkos::RangePolicy<Kokkos::DefaultExecutionSpace>(settings.L / 2 - d, settings.L / 2 + d),
+            Kokkos::RangePolicy<Kokkos::DefaultExecutionSpace>(L / 2 - d, L / 2 + d),
             KOKKOS_LAMBDA(int z)
     {
-        for (int y = settings.L / 2 - d; y < settings.L / 2 + d; y++)
+        for (int y = L / 2 - d; y < L / 2 + d; y++)
         {
-            for (int x = settings.L / 2 - d; x < settings.L / 2 + d; x++)
+            for (int x = L / 2 - d; x < L / 2 + d; x++)
             {
                 if (!is_inside(x, y, z))
                     continue;
@@ -153,6 +154,9 @@ KOKKOS_FUNCTION double GrayScott::laplacian(int x, int y, int z,
 
 void GrayScott::calc()
 {
+	auto const Du = settings.Du;
+	auto const Dv = settings.Dv;
+	auto const dt = settings.dt;
     Kokkos::parallel_for(
             "calc_gray_scott",
             Kokkos::RangePolicy<>(1, size_z + 1),
@@ -165,13 +169,13 @@ void GrayScott::calc()
                 const int i = l2i(x, y, z);
                 double du = 0.0;
                 double dv = 0.0;
-                du = settings.Du * laplacian(x, y, z, u);
-                dv = settings.Dv * laplacian(x, y, z, v);
+                du = Du * laplacian(x, y, z, u);
+                dv = Dv * laplacian(x, y, z, v);
                 du += calcU(u(i), v(i));
                 dv += calcV(u(i), v(i));
                 //du += settings.noise * uniform_dist(mt_gen);
-                u2(i) = u(i) + du * settings.dt;
-                v2(i) = v(i) + dv * settings.dt;
+                u2(i) = u(i) + du * dt;
+                v2(i) = v(i) + dv * dt;
             }
         }
     });
@@ -291,19 +295,22 @@ void GrayScott::exchange(std::vector<double> &u, std::vector<double> &v) const
 }
 
 void GrayScott::data_no_ghost_common(const Kokkos::View<double *> &data,
-                                     double *data_no_ghost) const
+                                     Kokkos::View<double *> data_no_ghost) const
 {
+	auto const sx = size_x;
+	auto const sy = size_y;
+	auto const sz = size_z;
     Kokkos::parallel_for(
             "updateBuffer",
-            Kokkos::RangePolicy<>(1, size_z + 1),
+            Kokkos::RangePolicy<>(1, sz + 1),
             KOKKOS_LAMBDA(int z)
     {
-        for (int y = 1; y < size_y + 1; y++)
+        for (int y = 1; y < sy + 1; y++)
         {
-            for (int x = 1; x < size_x + 1; x++)
+            for (int x = 1; x < sx + 1; x++)
             {
-                data_no_ghost[(x - 1) + (y - 1) * size_x +
-                              (z - 1) * size_x * size_y] = data(l2i(x, y, z));
+                data_no_ghost((x - 1) + (y - 1) * sx +
+                              (z - 1) * sx * sy) = data(l2i(x, y, z));
             }
         }
     });
