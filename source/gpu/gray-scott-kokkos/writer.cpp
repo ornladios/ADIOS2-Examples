@@ -66,8 +66,10 @@ Writer::Writer(const Settings &settings, const GrayScott &sim, adios2::IO io)
 
     std::vector<std::string> varList = {"U", "V"};
     std::vector<std::string> assocList = {"points", "points"};
-    io.DefineAttribute<std::string>("Fides_Variable_List", varList.data(), varList.size());
-    io.DefineAttribute<std::string>("Fides_Variable_Associations", assocList.data(), assocList.size());
+    io.DefineAttribute<std::string>("Fides_Variable_List", varList.data(),
+                                    varList.size());
+    io.DefineAttribute<std::string>("Fides_Variable_Associations",
+                                    assocList.data(), assocList.size());
 
     var_u =
         io.DefineVariable<double>("U", {settings.L, settings.L, settings.L},
@@ -111,8 +113,8 @@ void Writer::write(int step, const GrayScott &sim)
 
     if (settings.adios_memory_selection)
     {
-        const Kokkos::View<double *> &u = sim.u_ghost();
-        const Kokkos::View<double *> &v = sim.v_ghost();
+        const Kokkos::View<double ***> u = sim.u_ghost();
+        const Kokkos::View<double ***> v = sim.v_ghost();
 
         writer.BeginStep();
         writer.Put<int>(var_step, &step);
@@ -122,24 +124,13 @@ void Writer::write(int step, const GrayScott &sim)
     }
     else if (settings.adios_span)
     {
-        writer.BeginStep();
-
-        writer.Put<int>(var_step, &step);
-
-        // provide memory directly from adios buffer
-        adios2::Variable<double>::Span u_span = writer.Put<double>(var_u);
-        adios2::Variable<double>::Span v_span = writer.Put<double>(var_v);
-
-        // populate spans
-        sim.u_noghost(u_span.data());
-        sim.v_noghost(v_span.data());
-
-        writer.EndStep();
+        std::cout << "ADIOS2 Span with Kokkos currently not supported"
+                  << std::endl;
     }
     else
     {
-        std::vector<double> u = sim.u_noghost();
-        std::vector<double> v = sim.v_noghost();
+        Kokkos::View<double ***> u = sim.u_noghost();
+        Kokkos::View<double ***> v = sim.v_noghost();
 
         writer.BeginStep();
         writer.Put<int>(var_step, &step);

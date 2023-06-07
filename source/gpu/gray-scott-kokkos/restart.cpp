@@ -29,9 +29,9 @@ void WriteCkpt(MPI_Comm comm, const int step, const Settings &settings,
             size_t N = static_cast<size_t>(nproc);
 
             var_u = io.DefineVariable<double>("U", {N, X, Y, Z}, {R, 0, 0, 0},
-                                            {1, X, Y, Z});
+                                              {1, X, Y, Z});
             var_v = io.DefineVariable<double>("V", {N, X, Y, Z}, {R, 0, 0, 0},
-                                            {1, X, Y, Z});
+                                              {1, X, Y, Z});
 
             var_step = io.DefineVariable<int>("step");
             firstCkpt = false;
@@ -60,7 +60,8 @@ int ReadRestart(MPI_Comm comm, const Settings &settings, GrayScott &sim,
     MPI_Comm_size(comm, &nproc);
     if (!rank)
     {
-        std::cout << "restart from file " << settings.restart_input << std::endl;
+        std::cout << "restart from file " << settings.restart_input
+                  << std::endl;
     }
     adios2::Engine reader =
         io.Open(settings.restart_input, adios2::Mode::ReadRandomAccess);
@@ -73,7 +74,7 @@ int ReadRestart(MPI_Comm comm, const Settings &settings, GrayScott &sim,
         size_t Y = sim.size_y + 2;
         size_t Z = sim.size_z + 2;
         size_t R = static_cast<size_t>(rank);
-        Kokkos::View<double *> u("u", X * Y * Z), v("v", X * Y * Z);
+        Kokkos::View<double ***> u("u", X, Y, Z), v("v", X, Y, Z);
 
         var_u.SetSelection({{R, 0, 0, 0}, {1, X, Y, Z}});
         var_v.SetSelection({{R, 0, 0, 0}, {1, X, Y, Z}});
