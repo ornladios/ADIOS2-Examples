@@ -1,10 +1,10 @@
 #ifndef __GRAY_SCOTT_H__
 #define __GRAY_SCOTT_H__
 
-#include <random>
 #include <vector>
 
 #include <Kokkos_Core.hpp>
+#include <Kokkos_Random.hpp>
 #include <mpi.h>
 
 #include "settings.h"
@@ -52,9 +52,9 @@ public:
     MPI_Datatype xz_face_type;
     MPI_Datatype yz_face_type;
 
-    std::random_device rand_dev;
-    std::mt19937 mt_gen;
-    std::uniform_real_distribution<double> uniform_dist;
+	using RandomPool =
+        Kokkos::Random_XorShift64_Pool<Kokkos::DefaultExecutionSpace>;
+    RandomPool rand_pool;
 
     // Setup cartesian communicator data types
     void init_mpi();

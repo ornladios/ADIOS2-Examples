@@ -5,13 +5,11 @@
 #include "gray-scott.h"
 
 #include <mpi.h>
-#include <random>
 #include <stdexcept> // runtime_error
 #include <vector>
 
 GrayScott::GrayScott(const Settings &settings, MPI_Comm comm)
-: settings(settings), comm(comm), rand_dev(), mt_gen(rand_dev()),
-  uniform_dist(-1.0, 1.0)
+: settings(settings), comm(comm), rand_pool(5374857)
 {
 }
 
@@ -149,10 +147,13 @@ void GrayScott::calc()
     auto const dt = settings.dt;
     auto const F = settings.F;
     auto const k = settings.k;
+	auto const noise = settings.noise;
     size_t const sx = size_x, sy = size_y, sz = size_z;
+	auto const random_pool = rand_pool;
     Kokkos::parallel_for(
         "calc_gray_scott", Kokkos::RangePolicy<>(1, sz + 1),
         KOKKOS_LAMBDA(int z) {
+            RandomPool::generator_type generator = random_pool.get_state();
             double ts;
             for (int y = 1; y < sy + 1; y++)
             {
@@ -188,11 +189,12 @@ void GrayScott::calc()
                          F * (1.0 - temp_u(x, y, z)));
                     dv += (temp_u(x, y, z) * temp_v(x, y, z) * temp_v(x, y, z) -
                            (F + k) * temp_v(x, y, z));
-                    // du += settings.noise * uniform_dist(mt_gen);
+                    du += noise * generator.frand(-1.f, 1.f);
                     temp_u2(x, y, z) = temp_u(x, y, z) + du * dt;
                     temp_v2(x, y, z) = temp_v(x, y, z) + dv * dt;
                 }
             }
+            random_pool.free_state(generator);
         });
 }
 
