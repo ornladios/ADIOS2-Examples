@@ -65,13 +65,13 @@ public:
     void calc();
 
     // Exchange faces with neighbors
-    void exchange(std::vector<double> &u, std::vector<double> &v) const;
+    void exchange(Kokkos::View<double ***> u, Kokkos::View<double ***> v) const;
     // Exchange XY faces with north/south
-    void exchange_xy(std::vector<double> &local_data) const;
+    void exchange_xy(Kokkos::View<double ***> local_data) const;
     // Exchange XZ faces with up/down
-    void exchange_xz(std::vector<double> &local_data) const;
+    void exchange_xz(Kokkos::View<double ***> local_data) const;
     // Exchange YZ faces with west/east
-    void exchange_yz(std::vector<double> &local_data) const;
+    void exchange_yz(Kokkos::View<double ***> local_data) const;
 
     // Return a copy of data with ghosts removed
     Kokkos::View<double ***>
