@@ -107,25 +107,23 @@ void GrayScott::init_field()
     auto const temp_u = u;
     auto const temp_v = v;
     size_t const ox = offset_x, oy = offset_y, oz = offset_z;
-    size_t const sx = size_x, sy = size_y, sz = size_z;
+    size_t const sx = size_x, sy = size_y;
+    auto const min_z = std::max(L / 2 - d, offset_z);
+    auto const max_z = std::min(L / 2 + d, offset_z + size_z);
     Kokkos::parallel_for(
-        "init_buffers", Kokkos::RangePolicy<>(L / 2 - d, L / 2 + d),
+        "init_buffers", Kokkos::RangePolicy<>(min_z, max_z),
         KOKKOS_LAMBDA(int z) {
             for (int y = L / 2 - d; y < L / 2 + d; y++)
             {
+                if (y < oy)
+                    continue;
+                if (y >= oy + sy)
+                    continue;
                 for (int x = L / 2 - d; x < L / 2 + d; x++)
                 {
                     if (x < ox)
                         continue;
                     if (x >= ox + sx)
-                        continue;
-                    if (y < oy)
-                        continue;
-                    if (y >= oy + sy)
-                        continue;
-                    if (z < oz)
-                        continue;
-                    if (z >= oz + sz)
                         continue;
                     temp_u(x - ox + 1, y - oy + 1, z - oz + 1) = 0.25;
                     temp_v(x - ox + 1, y - oy + 1, z - oz + 1) = 0.33;
