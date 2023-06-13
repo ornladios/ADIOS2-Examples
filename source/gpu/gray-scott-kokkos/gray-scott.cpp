@@ -5,13 +5,11 @@
 #include "gray-scott.h"
 
 #include <mpi.h>
-#include <random>
 #include <stdexcept> // runtime_error
 #include <vector>
 
 GrayScott::GrayScott(const Settings &settings, MPI_Comm comm)
-: settings(settings), comm(comm), rand_dev(), mt_gen(rand_dev()),
-  uniform_dist(-1.0, 1.0)
+: settings(settings), comm(comm), rand_pool(5374857)
 {
 }
 
@@ -27,9 +25,7 @@ void GrayScott::iterate()
 {
     auto temp_u = Kokkos::create_mirror_view_and_copy(Kokkos::HostSpace{}, u);
     auto temp_v = Kokkos::create_mirror_view_and_copy(Kokkos::HostSpace{}, v);
-    std::vector<double> vu(temp_u.data(), temp_u.data() + temp_u.size());
-    std::vector<double> vv(temp_v.data(), temp_v.data() + temp_v.size());
-    exchange(vu, vv);
+    exchange(temp_u, temp_v);
     Kokkos::deep_copy(u, temp_u);
     Kokkos::deep_copy(v, temp_v);
 
@@ -111,25 +107,23 @@ void GrayScott::init_field()
     auto const temp_u = u;
     auto const temp_v = v;
     size_t const ox = offset_x, oy = offset_y, oz = offset_z;
-    size_t const sx = size_x, sy = size_y, sz = size_z;
+    size_t const sx = size_x, sy = size_y;
+    auto const min_z = std::max(L / 2 - d, offset_z);
+    auto const max_z = std::min(L / 2 + d, offset_z + size_z);
     Kokkos::parallel_for(
-        "init_buffers", Kokkos::RangePolicy<>(L / 2 - d, L / 2 + d),
+        "init_buffers", Kokkos::RangePolicy<>(min_z, max_z),
         KOKKOS_LAMBDA(int z) {
             for (int y = L / 2 - d; y < L / 2 + d; y++)
             {
+                if (y < oy)
+                    continue;
+                if (y >= oy + sy)
+                    continue;
                 for (int x = L / 2 - d; x < L / 2 + d; x++)
                 {
                     if (x < ox)
                         continue;
                     if (x >= ox + sx)
-                        continue;
-                    if (y < oy)
-                        continue;
-                    if (y >= oy + sy)
-                        continue;
-                    if (z < oz)
-                        continue;
-                    if (z >= oz + sz)
                         continue;
                     temp_u(x - ox + 1, y - oy + 1, z - oz + 1) = 0.25;
                     temp_v(x - ox + 1, y - oy + 1, z - oz + 1) = 0.33;
@@ -149,10 +143,13 @@ void GrayScott::calc()
     auto const dt = settings.dt;
     auto const F = settings.F;
     auto const k = settings.k;
+	auto const noise = settings.noise;
     size_t const sx = size_x, sy = size_y, sz = size_z;
+	auto const random_pool = rand_pool;
     Kokkos::parallel_for(
         "calc_gray_scott", Kokkos::RangePolicy<>(1, sz + 1),
         KOKKOS_LAMBDA(int z) {
+            RandomPool::generator_type generator = random_pool.get_state();
             double ts;
             for (int y = 1; y < sy + 1; y++)
             {
@@ -188,11 +185,12 @@ void GrayScott::calc()
                          F * (1.0 - temp_u(x, y, z)));
                     dv += (temp_u(x, y, z) * temp_v(x, y, z) * temp_v(x, y, z) -
                            (F + k) * temp_v(x, y, z));
-                    // du += settings.noise * uniform_dist(mt_gen);
+                    du += noise * generator.frand(-1.f, 1.f);
                     temp_u2(x, y, z) = temp_u(x, y, z) + du * dt;
                     temp_v2(x, y, z) = temp_v(x, y, z) + dv * dt;
                 }
             }
+            random_pool.free_state(generator);
         });
 }
 
@@ -256,49 +254,49 @@ void GrayScott::init_mpi()
     MPI_Type_commit(&yz_face_type);
 }
 
-void GrayScott::exchange_xy(std::vector<double> &local_data) const
+void GrayScott::exchange_xy(Kokkos::View<double ***> local_data) const
 {
     MPI_Status st;
 
     // Send XY face z=size_z to north and receive z=0 from south
-    MPI_Sendrecv(&local_data[l2i(1, 0, size_z)], 1, xy_face_type, north, 1,
-                 &local_data[l2i(1, 0, 0)], 1, xy_face_type, south, 1,
+    MPI_Sendrecv(&local_data.data()[l2i(1, 0, size_z)], 1, xy_face_type, north, 1,
+                 &local_data.data()[l2i(1, 0, 0)], 1, xy_face_type, south, 1,
                  cart_comm, &st);
     // Send XY face z=1 to south and receive z=size_z+1 from north
-    MPI_Sendrecv(&local_data[l2i(1, 0, 1)], 1, xy_face_type, south, 1,
-                 &local_data[l2i(1, 0, size_z + 1)], 1, xy_face_type, north, 1,
+    MPI_Sendrecv(&local_data.data()[l2i(1, 0, 1)], 1, xy_face_type, south, 1,
+                 &local_data.data()[l2i(1, 0, size_z + 1)], 1, xy_face_type, north, 1,
                  cart_comm, &st);
 }
 
-void GrayScott::exchange_xz(std::vector<double> &local_data) const
+void GrayScott::exchange_xz(Kokkos::View<double ***> local_data) const
 {
     MPI_Status st;
 
     // Send XZ face y=size_y to up and receive y=0 from down
-    MPI_Sendrecv(&local_data[l2i(1, size_y, 1)], 1, xz_face_type, up, 2,
-                 &local_data[l2i(1, 0, 1)], 1, xz_face_type, down, 2, cart_comm,
+    MPI_Sendrecv(&local_data.data()[l2i(1, size_y, 1)], 1, xz_face_type, up, 2,
+                 &local_data.data()[l2i(1, 0, 1)], 1, xz_face_type, down, 2, cart_comm,
                  &st);
     // Send XZ face y=1 to down and receive y=size_y+1 from up
-    MPI_Sendrecv(&local_data[l2i(1, 1, 1)], 1, xz_face_type, down, 2,
-                 &local_data[l2i(1, size_y + 1, 1)], 1, xz_face_type, up, 2,
+    MPI_Sendrecv(&local_data.data()[l2i(1, 1, 1)], 1, xz_face_type, down, 2,
+                 &local_data.data()[l2i(1, size_y + 1, 1)], 1, xz_face_type, up, 2,
                  cart_comm, &st);
 }
 
-void GrayScott::exchange_yz(std::vector<double> &local_data) const
+void GrayScott::exchange_yz(Kokkos::View<double ***> local_data) const
 {
     MPI_Status st;
 
     // Send YZ face x=size_x to east and receive x=0 from west
-    MPI_Sendrecv(&local_data[l2i(size_x, 0, 0)], 1, yz_face_type, east, 3,
-                 &local_data[l2i(0, 0, 0)], 1, yz_face_type, west, 3, cart_comm,
+    MPI_Sendrecv(&local_data.data()[l2i(size_x, 0, 0)], 1, yz_face_type, east, 3,
+                 &local_data.data()[l2i(0, 0, 0)], 1, yz_face_type, west, 3, cart_comm,
                  &st);
     // Send YZ face x=1 to west and receive x=size_x+1 from east
-    MPI_Sendrecv(&local_data[l2i(1, 0, 0)], 1, yz_face_type, west, 3,
-                 &local_data[l2i(size_x + 1, 0, 0)], 1, yz_face_type, east, 3,
+    MPI_Sendrecv(&local_data.data()[l2i(1, 0, 0)], 1, yz_face_type, west, 3,
+                 &local_data.data()[l2i(size_x + 1, 0, 0)], 1, yz_face_type, east, 3,
                  cart_comm, &st);
 }
 
-void GrayScott::exchange(std::vector<double> &u, std::vector<double> &v) const
+void GrayScott::exchange(Kokkos::View<double ***> u, Kokkos::View<double ***> v) const
 {
     exchange_xy(u);
     exchange_xz(u);

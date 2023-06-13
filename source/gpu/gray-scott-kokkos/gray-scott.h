@@ -1,10 +1,10 @@
 #ifndef __GRAY_SCOTT_H__
 #define __GRAY_SCOTT_H__
 
-#include <random>
 #include <vector>
 
 #include <Kokkos_Core.hpp>
+#include <Kokkos_Random.hpp>
 #include <mpi.h>
 
 #include "settings.h"
@@ -52,9 +52,9 @@ public:
     MPI_Datatype xz_face_type;
     MPI_Datatype yz_face_type;
 
-    std::random_device rand_dev;
-    std::mt19937 mt_gen;
-    std::uniform_real_distribution<double> uniform_dist;
+	using RandomPool =
+        Kokkos::Random_XorShift64_Pool<Kokkos::DefaultExecutionSpace>;
+    RandomPool rand_pool;
 
     // Setup cartesian communicator data types
     void init_mpi();
@@ -65,13 +65,13 @@ public:
     void calc();
 
     // Exchange faces with neighbors
-    void exchange(std::vector<double> &u, std::vector<double> &v) const;
+    void exchange(Kokkos::View<double ***> u, Kokkos::View<double ***> v) const;
     // Exchange XY faces with north/south
-    void exchange_xy(std::vector<double> &local_data) const;
+    void exchange_xy(Kokkos::View<double ***> local_data) const;
     // Exchange XZ faces with up/down
-    void exchange_xz(std::vector<double> &local_data) const;
+    void exchange_xz(Kokkos::View<double ***> local_data) const;
     // Exchange YZ faces with west/east
-    void exchange_yz(std::vector<double> &local_data) const;
+    void exchange_yz(Kokkos::View<double ***> local_data) const;
 
     // Return a copy of data with ghosts removed
     Kokkos::View<double ***>
