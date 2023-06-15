@@ -14,5 +14,4 @@ target_link_libraries(adios2-gray-scott-kokkos adios2::adios2 MPI::MPI_C Kokkos:
 install(TARGETS adios2-gray-scott-kokkos
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
-install(FILES "adios2.xml" "settings-files.json"
-        DESTINATION ${CMAKE_INSTALL_PREFIX}/share/adios2-examples/gray-scott-kokkos)
+
