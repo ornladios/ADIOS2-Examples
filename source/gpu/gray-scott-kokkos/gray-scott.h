@@ -67,17 +67,22 @@ public:
     void calc();
 
     // Exchange faces with neighbors
-    void exchange(Kokkos::View<double ***, Kokkos::LayoutLeft> u,
-                  Kokkos::View<double ***, Kokkos::LayoutLeft> v) const;
+    void
+    exchange(Kokkos::View<double ***, Kokkos::LayoutLeft, Kokkos::HostSpace> u,
+             Kokkos::View<double ***, Kokkos::LayoutLeft, Kokkos::HostSpace> v)
+        const;
     // Exchange XY faces with north/south
     void
-    exchange_xy(Kokkos::View<double ***, Kokkos::LayoutLeft> local_data) const;
+    exchange_xy(Kokkos::View<double ***, Kokkos::LayoutLeft, Kokkos::HostSpace>
+                    local_data) const;
     // Exchange XZ faces with up/down
     void
-    exchange_xz(Kokkos::View<double ***, Kokkos::LayoutLeft> local_data) const;
+    exchange_xz(Kokkos::View<double ***, Kokkos::LayoutLeft, Kokkos::HostSpace>
+                    local_data) const;
     // Exchange YZ faces with west/east
     void
-    exchange_yz(Kokkos::View<double ***, Kokkos::LayoutLeft> local_data) const;
+    exchange_yz(Kokkos::View<double ***, Kokkos::LayoutLeft, Kokkos::HostSpace>
+                    local_data) const;
 
     // Return a copy of data with ghosts removed
     Kokkos::View<double ***, Kokkos::LayoutLeft> data_noghost(

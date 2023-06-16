@@ -265,7 +265,8 @@ void GrayScott::init_mpi()
 }
 
 void GrayScott::exchange_xy(
-    Kokkos::View<double ***, Kokkos::LayoutLeft> local_data) const
+    Kokkos::View<double ***, Kokkos::LayoutLeft, Kokkos::HostSpace> local_data)
+    const
 {
     MPI_Status st;
 
@@ -280,7 +281,8 @@ void GrayScott::exchange_xy(
 }
 
 void GrayScott::exchange_xz(
-    Kokkos::View<double ***, Kokkos::LayoutLeft> local_data) const
+    Kokkos::View<double ***, Kokkos::LayoutLeft, Kokkos::HostSpace> local_data)
+    const
 {
     MPI_Status st;
 
@@ -295,7 +297,8 @@ void GrayScott::exchange_xz(
 }
 
 void GrayScott::exchange_yz(
-    Kokkos::View<double ***, Kokkos::LayoutLeft> local_data) const
+    Kokkos::View<double ***, Kokkos::LayoutLeft, Kokkos::HostSpace> local_data)
+    const
 {
     MPI_Status st;
 
@@ -309,8 +312,9 @@ void GrayScott::exchange_yz(
                  east, 3, cart_comm, &st);
 }
 
-void GrayScott::exchange(Kokkos::View<double ***, Kokkos::LayoutLeft> u,
-                         Kokkos::View<double ***, Kokkos::LayoutLeft> v) const
+void GrayScott::exchange(
+    Kokkos::View<double ***, Kokkos::LayoutLeft, Kokkos::HostSpace> u,
+    Kokkos::View<double ***, Kokkos::LayoutLeft, Kokkos::HostSpace> v) const
 {
     exchange_xy(u);
     exchange_xz(u);
