@@ -35,8 +35,8 @@ void GrayScott::iterate()
     std::swap(v, v2);
 }
 
-void GrayScott::restart(Kokkos::View<double ***> &u_in,
-                        Kokkos::View<double ***> &v_in)
+void GrayScott::restart(Kokkos::View<double ***, Kokkos::LayoutLeft> &u_in,
+                        Kokkos::View<double ***, Kokkos::LayoutLeft> &v_in)
 {
     auto const expected_len = (size_x + 2) * (size_y + 2) * (size_z + 2);
     if (u_in.size() == expected_len)
@@ -53,40 +53,50 @@ void GrayScott::restart(Kokkos::View<double ***> &u_in,
     }
 }
 
-const Kokkos::View<double ***> GrayScott::u_ghost() const { return u; }
+const Kokkos::View<double ***, Kokkos::LayoutLeft> GrayScott::u_ghost() const
+{
+    return u;
+}
 
-const Kokkos::View<double ***> GrayScott::v_ghost() const { return v; }
+const Kokkos::View<double ***, Kokkos::LayoutLeft> GrayScott::v_ghost() const
+{
+    return v;
+}
 
-Kokkos::View<double ***> GrayScott::u_noghost() const
+Kokkos::View<double ***, Kokkos::LayoutLeft> GrayScott::u_noghost() const
 {
     return data_noghost(u);
 }
 
-Kokkos::View<double ***> GrayScott::v_noghost() const
+Kokkos::View<double ***, Kokkos::LayoutLeft> GrayScott::v_noghost() const
 {
     return data_noghost(v);
 }
 
-void GrayScott::u_noghost(Kokkos::View<double ***> u_no_ghost) const
+void GrayScott::u_noghost(
+    Kokkos::View<double ***, Kokkos::LayoutLeft> u_no_ghost) const
 {
     data_noghost(u, u_no_ghost);
 }
 
-void GrayScott::v_noghost(Kokkos::View<double ***> v_no_ghost) const
+void GrayScott::v_noghost(
+    Kokkos::View<double ***, Kokkos::LayoutLeft> v_no_ghost) const
 {
     data_noghost(v, v_no_ghost);
 }
 
-Kokkos::View<double ***>
-GrayScott::data_noghost(const Kokkos::View<double ***> &data) const
+Kokkos::View<double ***, Kokkos::LayoutLeft> GrayScott::data_noghost(
+    const Kokkos::View<double ***, Kokkos::LayoutLeft> &data) const
 {
-    Kokkos::View<double ***> buf("noghost_temp", size_x, size_y, size_z);
+    Kokkos::View<double ***, Kokkos::LayoutLeft> buf("noghost_temp", size_x,
+                                                     size_y, size_z);
     data_no_ghost_common(data, buf);
     return buf;
 }
 
-void GrayScott::data_noghost(const Kokkos::View<double ***> &data,
-                             Kokkos::View<double ***> data_no_ghost) const
+void GrayScott::data_noghost(
+    const Kokkos::View<double ***, Kokkos::LayoutLeft> &data,
+    Kokkos::View<double ***, Kokkos::LayoutLeft> data_no_ghost) const
 {
     data_no_ghost_common(data, data_no_ghost);
 }
@@ -143,9 +153,9 @@ void GrayScott::calc()
     auto const dt = settings.dt;
     auto const F = settings.F;
     auto const k = settings.k;
-	auto const noise = settings.noise;
+    auto const noise = settings.noise;
     size_t const sx = size_x, sy = size_y, sz = size_z;
-	auto const random_pool = rand_pool;
+    auto const random_pool = rand_pool;
     Kokkos::parallel_for(
         "calc_gray_scott", Kokkos::RangePolicy<>(1, sz + 1),
         KOKKOS_LAMBDA(int z) {
@@ -254,49 +264,57 @@ void GrayScott::init_mpi()
     MPI_Type_commit(&yz_face_type);
 }
 
-void GrayScott::exchange_xy(Kokkos::View<double ***> local_data) const
+void GrayScott::exchange_xy(
+    Kokkos::View<double ***, Kokkos::LayoutLeft, Kokkos::HostSpace> local_data)
+    const
 {
     MPI_Status st;
 
     // Send XY face z=size_z to north and receive z=0 from south
-    MPI_Sendrecv(&local_data.data()[l2i(1, 0, size_z)], 1, xy_face_type, north, 1,
-                 &local_data.data()[l2i(1, 0, 0)], 1, xy_face_type, south, 1,
+    MPI_Sendrecv(&local_data.data()[l2i(1, 0, size_z)], 1, xy_face_type, north,
+                 1, &local_data.data()[l2i(1, 0, 0)], 1, xy_face_type, south, 1,
                  cart_comm, &st);
     // Send XY face z=1 to south and receive z=size_z+1 from north
     MPI_Sendrecv(&local_data.data()[l2i(1, 0, 1)], 1, xy_face_type, south, 1,
-                 &local_data.data()[l2i(1, 0, size_z + 1)], 1, xy_face_type, north, 1,
-                 cart_comm, &st);
+                 &local_data.data()[l2i(1, 0, size_z + 1)], 1, xy_face_type,
+                 north, 1, cart_comm, &st);
 }
 
-void GrayScott::exchange_xz(Kokkos::View<double ***> local_data) const
+void GrayScott::exchange_xz(
+    Kokkos::View<double ***, Kokkos::LayoutLeft, Kokkos::HostSpace> local_data)
+    const
 {
     MPI_Status st;
 
     // Send XZ face y=size_y to up and receive y=0 from down
     MPI_Sendrecv(&local_data.data()[l2i(1, size_y, 1)], 1, xz_face_type, up, 2,
-                 &local_data.data()[l2i(1, 0, 1)], 1, xz_face_type, down, 2, cart_comm,
-                 &st);
+                 &local_data.data()[l2i(1, 0, 1)], 1, xz_face_type, down, 2,
+                 cart_comm, &st);
     // Send XZ face y=1 to down and receive y=size_y+1 from up
     MPI_Sendrecv(&local_data.data()[l2i(1, 1, 1)], 1, xz_face_type, down, 2,
-                 &local_data.data()[l2i(1, size_y + 1, 1)], 1, xz_face_type, up, 2,
-                 cart_comm, &st);
+                 &local_data.data()[l2i(1, size_y + 1, 1)], 1, xz_face_type, up,
+                 2, cart_comm, &st);
 }
 
-void GrayScott::exchange_yz(Kokkos::View<double ***> local_data) const
+void GrayScott::exchange_yz(
+    Kokkos::View<double ***, Kokkos::LayoutLeft, Kokkos::HostSpace> local_data)
+    const
 {
     MPI_Status st;
 
     // Send YZ face x=size_x to east and receive x=0 from west
-    MPI_Sendrecv(&local_data.data()[l2i(size_x, 0, 0)], 1, yz_face_type, east, 3,
-                 &local_data.data()[l2i(0, 0, 0)], 1, yz_face_type, west, 3, cart_comm,
-                 &st);
+    MPI_Sendrecv(&local_data.data()[l2i(size_x, 0, 0)], 1, yz_face_type, east,
+                 3, &local_data.data()[l2i(0, 0, 0)], 1, yz_face_type, west, 3,
+                 cart_comm, &st);
     // Send YZ face x=1 to west and receive x=size_x+1 from east
     MPI_Sendrecv(&local_data.data()[l2i(1, 0, 0)], 1, yz_face_type, west, 3,
-                 &local_data.data()[l2i(size_x + 1, 0, 0)], 1, yz_face_type, east, 3,
-                 cart_comm, &st);
+                 &local_data.data()[l2i(size_x + 1, 0, 0)], 1, yz_face_type,
+                 east, 3, cart_comm, &st);
 }
 
-void GrayScott::exchange(Kokkos::View<double ***> u, Kokkos::View<double ***> v) const
+void GrayScott::exchange(
+    Kokkos::View<double ***, Kokkos::LayoutLeft, Kokkos::HostSpace> u,
+    Kokkos::View<double ***, Kokkos::LayoutLeft, Kokkos::HostSpace> v) const
 {
     exchange_xy(u);
     exchange_xz(u);
@@ -308,8 +326,8 @@ void GrayScott::exchange(Kokkos::View<double ***> u, Kokkos::View<double ***> v)
 }
 
 void GrayScott::data_no_ghost_common(
-    const Kokkos::View<double ***> &data,
-    Kokkos::View<double ***> data_no_ghost) const
+    const Kokkos::View<double ***, Kokkos::LayoutLeft> &data,
+    Kokkos::View<double ***, Kokkos::LayoutLeft> data_no_ghost) const
 {
     auto const sx = size_x;
     auto const sy = size_y;

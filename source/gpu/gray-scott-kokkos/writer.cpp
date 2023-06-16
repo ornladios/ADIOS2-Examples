@@ -113,8 +113,8 @@ void Writer::write(int step, const GrayScott &sim)
 
     if (settings.adios_memory_selection)
     {
-        const Kokkos::View<double ***> u = sim.u_ghost();
-        const Kokkos::View<double ***> v = sim.v_ghost();
+        const Kokkos::View<double ***, Kokkos::LayoutLeft> u = sim.u_ghost();
+        const Kokkos::View<double ***, Kokkos::LayoutLeft> v = sim.v_ghost();
 
         writer.BeginStep();
         writer.Put<int>(var_step, &step);
@@ -129,8 +129,8 @@ void Writer::write(int step, const GrayScott &sim)
     }
     else
     {
-        Kokkos::View<double ***> u = sim.u_noghost();
-        Kokkos::View<double ***> v = sim.v_noghost();
+        Kokkos::View<double ***, Kokkos::LayoutLeft> u = sim.u_noghost();
+        Kokkos::View<double ***, Kokkos::LayoutLeft> v = sim.v_noghost();
 
         writer.BeginStep();
         writer.Put<int>(var_step, &step);
