@@ -33,8 +33,10 @@ def reader(ad):
     """read a string from to a bp file"""
     io = ad.DeclareIO("hello-world-reader")
     r = io.Open(DATA_FILENAME, adios2.Mode.Read)
+    r.BeginStep()
     var_greeting = io.InquireVariable("Greeting")
     message = r.Get(var_greeting)
+    r.EndStep()
     return message
 
 
